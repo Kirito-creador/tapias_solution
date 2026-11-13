@@ -38,7 +38,7 @@ if (!isset($_SESSION['rol'])) {
             echo "<p class='lead mb-4'>Bienvenido/a. Tienes acceso total al sistema.</p>";
             echo "<div class='alert alert-dark panel-card mb-4'>Rol: <strong>Administrador</strong></div>";
             echo "<div class='row justify-content-center gap-3'>
-                    <div class='col-md-3'><a href='index.php' class='btn btn-primary w-100 p-3'>Gestionar Propiedades</a></div>
+                    <div class='col-md-3'><a href='propiedades.php' class='btn btn-primary w-100 p-3'>Gestionar Propiedades</a></div>
                     <div class='col-md-3'><a href='#' class='btn btn-secondary w-100 p-3'>Gestionar Agentes</a></div>
                   </div>";
         } elseif ($_SESSION['rol'] == 'Agente') {
