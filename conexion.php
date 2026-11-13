@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 <?php
 $servidor = "localhost";
@@ -12,3 +13,6 @@ if (!$conexion) {
 }
 $conexion->set_charset("utf8");
 ?>
+=======
+sejhbcud
+>>>>>>> 73e7b6adbb3344fe72f7a20e5999f4cb1fe82bea
