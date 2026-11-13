@@ -78,6 +78,5 @@ if (isset($_SESSION['rol'])) {
             </form>
         </div>
     </div>
-
 </body>
 </html>
