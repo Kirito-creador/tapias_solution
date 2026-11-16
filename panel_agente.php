@@ -1,0 +1,85 @@
+<?php
+include("conexion.php");
+
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
+    header("Location: login.php");
+    exit();
+}
+
+$id_agente = $_SESSION['id_usuario'];
+
+// Contadores para las tarjetas
+$total_propiedades = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente"))['total'];
+$disponibles = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Disponible'"))['total'];
+$vendidas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'"))['total'];
+$alquiladas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Alquilado'"))['total'];
+
+// Cálculo de comisión (ejemplo: 1% del precio de las propiedades vendidas)
+$comision_query = mysqli_query($conexion, "SELECT SUM(precio * 0.01) as comision FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'");
+$comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel del Agente - Tapia's Solution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; color: #3E2A1E; }
+        .navbar { background-color: #3E2A1E; }
+        .navbar-brand, .nav-link { color: #F2EBDD !important; }
+        h2, h3 { font-family: 'Playfair Display', serif; }
+        .card-stat { border: none; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; padding: 20px; background: white; }
+        .card-stat h5 { color: #6B6B43; font-weight: 600; }
+        .card-stat h1 { font-family: 'Playfair Display', serif; color: #3E2A1E; font-size: 3rem; margin: 0; }
+        .btn-terracotta { background-color: #C1512F; color: white; border: none; }
+        .btn-terracotta:hover { background-color: #a34225; color: white; }
+        .btn-olive { background-color: #6B6B43; color: white; border: none; }
+        .btn-olive:hover { background-color: #555533; color: white; }
+        .comision-box { background-color: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">Tapia's Solution</a>
+            <div class="navbar-nav ms-auto align-items-center">
+                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?> (Agente)</span>
+                <a class="nav-link" href="logout.php">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mb-1">Panel del Agente</h2>
+        <p class="mb-4">Bienvenido, <strong><?= $_SESSION['nombre'] ?></strong></p>
+
+        <!-- Tarjetas de Métricas -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3"><div class="card-stat"><h5>Mis Propiedades</h5><h1><?= $total_propiedades ?></h1></div></div>
+            <div class="col-md-3 mb-3"><div class="card-stat"><h5>Disponibles</h5><h1><?= $disponibles ?></h1></div></div>
+            <div class="col-md-3 mb-3"><div class="card-stat"><h5>Vendidas</h5><h1><?= $vendidas ?></h1></div></div>
+            <div class="col-md-3 mb-3"><div class="card-stat"><h5>Alquiladas</h5><h1><?= $alquiladas ?></h1></div></div>
+        </div>
+
+        <!-- Comisión -->
+        <div class="comision-box mb-4">
+            <h5 class="fw-bold">Mi Comisión Total</h5>
+            <h1 style="color: #6B6B43; font-family: 'Playfair Display', serif;">$<?= number_format($comision, 2) ?></h1>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <a href="registrar_propiedad.php" class="btn btn-terracotta w-100 py-3 mb-2">+ Registrar Nueva Propiedad</a>
+                <a href="citas_agente.php" class="btn btn-terracotta w-100 py-3">Ver Mis Citas</a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <a href="propiedades_agente.php" class="btn btn-olive w-100 py-3 mb-2">= Ver Mis Propiedades</a>
+                <a href="agendar_cita.php" class="btn btn-olive w-100 py-3">+ Agendar Visita</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
