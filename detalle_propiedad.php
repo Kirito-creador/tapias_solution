@@ -6,12 +6,10 @@ if (!isset($_SESSION['rol']) || ($_SESSION['rol'] != 'Administrador' && $_SESSIO
     exit();
 }
 
-if (!isset($_GET['id'])) { header("Location: index.php"); exit(); }
+if (!isset($_GET['id'])) { header("Location: panel.php"); exit(); }
 $id = intval($_GET['id']);
 
-$sql = "SELECT p.*, u.nombre_completo FROM propiedad p 
-        INNER JOIN usuario u ON p.id_agente = u.id_usuario 
-        WHERE p.id_propiedad = $id";
+$sql = "SELECT p.*, u.nombre_completo FROM propiedad p INNER JOIN usuario u ON p.id_agente = u.id_usuario WHERE p.id_propiedad = $id";
 $res = mysqli_query($conexion, $sql);
 $prop = mysqli_fetch_assoc($res);
 
@@ -21,14 +19,9 @@ if (!$prop) { die("Propiedad no encontrada."); }
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Detalle Propiedad - Tapia's Solution</title>
+    <title>Detalle Propiedad</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; }
-        .card-header { background-color: #3E2A1E; color: #F2EBDD; font-family: 'Playfair Display', serif; }
-        .btn-warning { background-color: #C1512F; border: none; color: white; }
-        .btn-warning:hover { background-color: #a34225; color: white; }
-    </style>
+    <style> body { background-color: #F2EBDD; } .card-header { background-color: #3E2A1E; color: #F2EBDD; font-family: 'Playfair Display', serif;} </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -48,8 +41,7 @@ if (!$prop) { die("Propiedad no encontrada."); }
                     <li class="list-group-item"><strong>Agente Responsable:</strong> <?= $prop['nombre_completo'] ?></li>
                     <li class="list-group-item"><strong>Descripción:</strong><br> <?= nl2br($prop['descripcion']) ?></li>
                 </ul>
-                <a href="index.php" class="btn btn-secondary">Volver a la lista</a>
-                <a href="editar_propiedad.php?id=<?= $prop['id_propiedad'] ?>" class="btn btn-warning">Editar</a>
+                <a href="<?= ($_SESSION['rol'] == 'Agente') ? 'propiedades_agente.php' : 'propiedades.php' ?>" class="btn btn-secondary">Volver a la lista</a>
             </div>
         </div>
     </div>
