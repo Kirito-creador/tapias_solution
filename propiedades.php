@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("conexion.php");
 
 // Seguridad: Solo el Administrador puede ver esta página
