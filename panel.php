@@ -39,7 +39,7 @@ if (!isset($_SESSION['rol'])) {
             echo "<div class='alert alert-dark panel-card mb-4'>Rol: <strong>Administrador</strong></div>";
             echo "<div class='row justify-content-center gap-3'>
                     <div class='col-md-3'><a href='propiedades.php' class='btn btn-primary w-100 p-3'>Gestionar Propiedades</a></div>
-                    <div class='col-md-3'><a href='#' class='btn btn-secondary w-100 p-3'>Gestionar Agentes</a></div>
+                    <div class='col-md-3'><a href='agentes.php' class='btn btn-secondary w-100 p-3'>Gestionar Agentes</a></div>
                   </div>";
         } elseif ($_SESSION['rol'] == 'Agente') {
             echo "<h1 class='mb-3' style='color: #C1512F;'>Panel de Agente</h1>";
@@ -47,7 +47,7 @@ if (!isset($_SESSION['rol'])) {
             echo "<div class='alert alert-warning panel-card mb-4'>Rol: <strong>Agente Inmobiliario</strong></div>";
             echo "<div class='row justify-content-center gap-3'>
                     <div class='col-md-3'><a href='propiedades.php' class='btn btn-primary w-100 p-3'>Mis Propiedades</a></div>
-                    <div class='col-md-3'><a href='#' class='btn btn-success w-100 p-3'>Mis Citas Agendadas</a></div>
+                    <div class='col-md-3'><a href='citas.php' class='btn btn-success w-100 p-3'>Mis Citas Agendadas</a></div>
                   </div>";
         } elseif ($_SESSION['rol'] == 'Cliente') {
             echo "<h1 class='mb-3' style='color: #6B6B43;'>Panel de Cliente</h1>";
