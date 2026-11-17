@@ -2,13 +2,11 @@
 session_start();
 include("conexion.php");
 
-// Seguridad: Solo el Administrador puede ver esta página
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
     header("Location: login.php");
     exit();
 }
 
-// ¡AQUÍ ESTÁ LA MAGIA! No hay WHERE, así que trae TODAS las propiedades
 $consulta = "SELECT p.*, u.nombre_completo FROM propiedad p 
              INNER JOIN usuario u ON p.id_agente = u.id_usuario 
              ORDER BY p.id_propiedad DESC";
@@ -20,6 +18,8 @@ $resultado = mysqli_query($conexion, $consulta);
     <meta charset="UTF-8">
     <title>Gestión de Propiedades - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; }
         h2 { font-family: 'Playfair Display', serif; color: #3E2A1E; }
@@ -28,6 +28,15 @@ $resultado = mysqli_query($conexion, $consulta);
         .btn-primary { background-color: #C1512F; border: none; }
         .table-dark { background-color: #3E2A1E; color: #F2EBDD; }
         .badge-disponible { background-color: #6B6B43; color: white; }
+        
+        footer {
+            background-color: #3E2A1E;
+            color: #F2EBDD;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        footer a { color: #F2EBDD; text-decoration: none; }
+        footer h6 { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -71,7 +80,6 @@ $resultado = mysqli_query($conexion, $consulta);
                                 <td>
                                     <a href="detalle_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn btn-sm btn-info text-white">Ver</a>
                                     <a href="editar_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn btn-sm btn-warning">Editar</a>
-                                    <!-- El botón de eliminar solo aparece aquí porque acabamos de validar que el rol es Administrador -->
                                     <a href="eliminar_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas eliminar esta propiedad?');">Eliminar</a>
                                 </td>
                             </tr>
@@ -85,6 +93,5 @@ $resultado = mysqli_query($conexion, $consulta);
             </table>
         </div>
     </div>
+
     <?php include("footer.php"); ?>
-</body>
-</html>
