@@ -8,9 +8,10 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
     exit();
 }
 
-// Consulta para traer las citas completadas (asumiendo id_estado = 3 para completadas)
+// Consulta para traer las propiedades vendidas/completadas
+// NOTA: Ajusta el nombre de las columnas (tipo_operacion, precio, etc.) si en tu BD se llaman distinto.
 $sql = "SELECT c.id_cita, c.fecha_cita,
-               p.direccion, p.zona, p.tipo AS prop_tipo, p.tipo_operacion, p.precio,
+               p.tipo AS prop_tipo, p.zona, p.tipo_operacion, p.precio,
                a.nombre_completo AS agente_nombre
         FROM cita c
         INNER JOIN propiedad p ON c.id_propiedad = p.id_propiedad
@@ -20,10 +21,50 @@ $sql = "SELECT c.id_cita, c.fecha_cita,
 
 $resultado = mysqli_query($conexion, $sql);
 
-// Variables para acumular los totales de las tarjetas
 $total_comision_empresa = 0;
 $total_comision_agentes = 0;
 $total_ganancia_neta = 0;
+$citas = [];
+
+// Procesar los datos primero para calcular los totales de las tarjetas
+while ($fila = mysqli_fetch_assoc($resultado)) {
+    $precio = $fila['precio'];
+    $tipo_op = strtolower(trim($fila['tipo_operacion'])); 
+    
+    $porcentaje_empresa = 0;
+    $porcentaje_agente = 0;
+
+    // Lógica de porcentajes exacta solicitada
+    if ($tipo_op == 'venta') {
+        $porcentaje_empresa = 5.00;
+        $porcentaje_agente = 1.00;
+    } elseif ($tipo_op == 'anticretico' || $tipo_op == 'anticrético') {
+        $porcentaje_empresa = 4.00;
+        $porcentaje_agente = 0.75;
+    } elseif ($tipo_op == 'alquiler') {
+        $porcentaje_empresa = 3.00;
+        $porcentaje_agente = 0.50;
+    }
+
+    // Cálculos
+    $comision_empresa = $precio * ($porcentaje_empresa / 100);
+    $comision_agente = $precio * ($porcentaje_agente / 100);
+    
+    // Ganancia Neta (Asumida como lo que le queda a la empresa)
+    $ganancia_neta = $comision_empresa; 
+
+    $total_comision_empresa += $comision_empresa;
+    $total_comision_agentes += $comision_agente;
+    $total_ganancia_neta += $ganancia_neta;
+
+    // Guardar datos para la tabla
+    $fila['porcentaje_empresa'] = $porcentaje_empresa;
+    $fila['porcentaje_agente'] = $porcentaje_agente;
+    $fila['comision_empresa'] = $comision_empresa;
+    $fila['comision_agente'] = $comision_agente;
+    $fila['ganancia_neta'] = $ganancia_neta;
+    $citas[] = $fila;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -40,25 +81,88 @@ $total_ganancia_neta = 0;
             --navbar-bg: #3E2A1E;
             --btn-color: #C1512F;
             --text-color: #3E2A1E;
+            --border-color: #d3c8be;
         }
-        body { background-color: var(--bg-color); font-family: 'Nunito Sans', sans-serif; color: var(--text-color); }
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Nunito Sans', sans-serif; 
+            color: var(--text-color); 
+        }
+        
+        /* Navbar */
         .navbar { background-color: var(--navbar-bg); border-bottom: 2px solid var(--navbar-bg); }
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        /* Título principal */
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--navbar-bg);
+            margin-bottom: 25px;
+        }
+
+        /* Estilos de Tarjetas Superiores */
+        .card-stat { 
+            background-color: #ffffff; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            padding: 20px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
+            height: 100%;
+        }
+        .card-stat h5 { 
+            color: #6c5c54; 
+            font-size: 1.1rem; 
+            margin-bottom: 15px; 
+            font-family: 'Nunito Sans', sans-serif; 
+            font-weight: 700;
+        }
+        .card-stat h2 { 
+            margin: 0; 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        .text-ganancia { color: #1e6b42; } /* Verde oscuro de la imagen */
+
+        /* Estilos de la Tabla */
+        .table-custom { 
+            background-color: transparent; 
+            margin-bottom: 0;
+        }
+        .table-custom thead { 
+            background-color: #3E2A1E; 
+            color: white; 
+        }
+        .table-custom thead th { 
+            font-weight: 600; 
+            padding: 15px; 
+            border: none; 
+            font-size: 0.95rem;
+        }
+        .table-custom tbody tr {
+            background-color: #ffffff;
+        }
+        .table-custom tbody td { 
+            padding: 15px; 
+            vertical-align: middle; 
+            border: 1px solid #f0ebe6;
+            border-top: none;
+            color: #4a4a4a;
+        }
+        .table-custom tbody tr:last-child td { 
+            border-bottom: 1px solid #f0ebe6; 
+        }
         
-        /* Estilos de Tarjetas */
-        .card-stat { border-radius: 8px; border: 1px solid #E0D4CD; background-color: white; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .card-stat h5 { color: #7A6B63; font-size: 1rem; margin-bottom: 10px; font-family: 'Nunito Sans', sans-serif; font-weight: 700;}
-        .card-stat h2 { margin: 0; font-family: 'Playfair Display', serif; font-weight: 600; }
-        .text-ganancia { color: #2e7d32; }
+        /* Contenedor de la tabla con sombra */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
 
-        /* Estilos de la tabla */
-        .table-custom { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .table-custom thead { background-color: #3E2A1E; color: white; }
-        .table-custom thead th { font-weight: 600; padding: 15px; border: none; }
-        .table-custom tbody td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #E0D4CD; }
-        .table-custom tbody tr:last-child td { border-bottom: none; }
-
+        /* Footer */
         footer {
             background-color: var(--navbar-bg);
             color: #F2EBDD;
@@ -66,7 +170,15 @@ $total_ganancia_neta = 0;
             margin-top: 50px;
         }
         footer a { color: #F2EBDD; text-decoration: none; }
-        footer h6 { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        footer h6 { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-size: 0.9rem;}
+        footer .social-icons a { 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 35px; height: 35px; border-radius: 50%; 
+            background-color: rgba(255,255,255,0.1); 
+            color: #e09378;
+            margin: 0 5px;
+        }
+        footer .social-icons a:hover { background-color: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
@@ -75,8 +187,9 @@ $total_ganancia_neta = 0;
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="panel.php">
-                <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
-                Tapia's Solution
+                <!-- Icono de casita simulado con Bootstrap Icons -->
+                <i class="bi bi-house-door-fill" style="font-size: 1.8rem; color: #7d9f7d; margin-right: 10px;"></i>
+                <span style="font-weight: 700; font-size: 1.2rem;">Tapia's Solution</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -91,7 +204,7 @@ $total_ganancia_neta = 0;
                     </li>
                 </ul>
                 <div class="navbar-nav align-items-center">
-                    <span class="nav-link me-3"><i class="bi bi-person-circle"></i> Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
+                    <span class="nav-link me-3"><i class="bi bi-person-circle"></i> Hola, <?= htmlspecialchars($_SESSION['nombre']) ?></span>
                     <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
                 </div>
             </div>
@@ -99,51 +212,8 @@ $total_ganancia_neta = 0;
     </nav>
 
     <!-- Contenido Principal -->
-    <div class="container mt-4">
-        <h1 class="mb-4" style="color: var(--navbar-bg);">Reporte de Comisiones</h1>
-
-        <!-- Calculamos los totales primero para mostrarlos en las tarjetas -->
-        <?php
-        // Guardamos los datos en un array temporal para poder recorrerlo dos veces (una para totales y otra para la tabla)
-        $citas = [];
-        while ($fila = mysqli_fetch_assoc($resultado)) {
-            $precio = $fila['precio'];
-            $tipo_op = strtolower(trim($fila['tipo_operacion'])); // 'venta', 'anticretico', 'alquiler'
-            
-            $porcentaje_empresa = 0;
-            $porcentaje_agente = 0;
-
-            // Lógica de porcentajes
-            if ($tipo_op == 'venta') {
-                $porcentaje_empresa = 5.00;
-                $porcentaje_agente = 1.00;
-            } elseif ($tipo_op == 'anticretico' || $tipo_op == 'anticrético') {
-                $porcentaje_empresa = 4.00;
-                $porcentaje_agente = 0.75;
-            } elseif ($tipo_op == 'alquiler') {
-                $porcentaje_empresa = 3.00;
-                $porcentaje_agente = 0.50;
-            }
-
-            // Cálculos
-            $comision_empresa = $precio * ($porcentaje_empresa / 100);
-            $comision_agente = $precio * ($porcentaje_agente / 100);
-            $ganancia_neta = $comision_empresa; // Ganancia Neta para la empresa
-
-            // Acumular totales
-            $total_comision_empresa += $comision_empresa;
-            $total_comision_agentes += $comision_agente;
-            $total_ganancia_neta += $ganancia_neta;
-
-            // Guardamos los datos calculados para la tabla
-            $fila['porcentaje_empresa'] = $porcentaje_empresa;
-            $fila['porcentaje_agente'] = $porcentaje_agente;
-            $fila['comision_empresa'] = $comision_empresa;
-            $fila['comision_agente'] = $comision_agente;
-            $fila['ganancia_neta'] = $ganancia_neta;
-            $citas[] = $fila;
-        }
-        ?>
+    <div class="container mt-5">
+        <h1 class="page-title">Reporte de Comisiones</h1>
 
         <!-- Tarjetas de Resumen -->
         <div class="row mb-4">
@@ -168,8 +238,8 @@ $total_ganancia_neta = 0;
         </div>
 
         <!-- Tabla de Datos -->
-        <div class="table-responsive">
-            <table class="table table-custom table-hover mb-0">
+        <div class="table-container table-responsive">
+            <table class="table table-custom mb-0">
                 <thead>
                     <tr>
                         <th>Propiedad</th>
@@ -190,19 +260,19 @@ $total_ganancia_neta = 0;
                             <tr>
                                 <td><?= htmlspecialchars($fila['prop_tipo']) ?> en <?= htmlspecialchars($fila['zona']) ?></td>
                                 <td><?= ucfirst(htmlspecialchars($fila['tipo_operacion'])) ?></td>
-                                <td>USD <?= number_format($fila['precio'], 2, ',', '.') ?></td>
+                                <td>USD <?= number_format($fila['precio'], 2, '.', ',') ?></td>
                                 <td><?= htmlspecialchars($fila['agente_nombre']) ?></td>
                                 <td><?= date('d/m/Y', strtotime($fila['fecha_cita'])) ?></td>
                                 <td><?= number_format($fila['porcentaje_empresa'], 2) ?>%</td>
-                                <td>$<?= number_format($fila['comision_empresa'], 2, ',', '.') ?></td>
+                                <td>$<?= number_format($fila['comision_empresa'], 2, '.', ',') ?></td>
                                 <td><?= number_format($fila['porcentaje_agente'], 2) ?>%</td>
-                                <td>$<?= number_format($fila['comision_agente'], 2, ',', '.') ?></td>
-                                <td class="text-ganancia">$<?= number_format($fila['ganancia_neta'], 2, ',', '.') ?></td>
+                                <td>$<?= number_format($fila['comision_agente'], 2, '.', ',') ?></td>
+                                <td class="text-ganancia">$<?= number_format($fila['ganancia_neta'], 2, '.', ',') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="10" class="text-center py-4">No hay comisiones registradas en el sistema.</td>
+                            <td colspan="10" class="text-center py-5 text-muted">No hay comisiones registradas en el sistema.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -226,10 +296,10 @@ $total_ganancia_neta = 0;
                 </div>
                 <div class="col-md-4 mb-3">
                     <h6>Contacto</h6>
-                    <div class="d-flex justify-content-center gap-3 mt-2">
-                        <a href="#"><i class="bi bi-whatsapp fs-4"></i></a>
-                        <a href="#"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="#"><i class="bi bi-instagram fs-4"></i></a>
+                    <div class="social-icons mt-2">
+                        <a href="#"><i class="bi bi-whatsapp"></i></a>
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
                     </div>
                 </div>
             </div>
