@@ -292,14 +292,23 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
                 <div class="col-md-4 mb-3">
                     <h6>Oficina</h6>
                     <p class="mb-1"><i class="bi bi-geo-alt"></i> Cochabamba, Bolivia</p>
-                    <a href="#"><i class="bi bi-map"></i> Ver en Google Maps</a>
+                    <a href="https://maps.app.goo.gl/jb2g7p2X9hqTL6o17" target="_blank"><i class="bi bi-map"></i> Ver en Google Maps</a>
                 </div>
                 <div class="col-md-4 mb-3">
                     <h6>Contacto</h6>
-                    <div class="social-icons mt-2">
-                        <a href="#"><i class="bi bi-whatsapp"></i></a>
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
+                    <div class="d-flex justify-content-center gap-3 mt-2">
+                        <!-- WhatsApp -->
+                        <a href="https://wa.me/59169172830" target="_blank" title="WhatsApp">
+                            <i class="bi bi-whatsapp fs-4"></i>
+                        </a>
+                        <!-- Facebook -->
+                        <a href="https://www.facebook.com/share/1HmqoGDtrb/" target="_blank" title="Facebook">
+                            <i class="bi bi-facebook fs-4"></i>
+                        </a>
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/tapiasolution?stkn=NXRxem8xNHoxazJ1" target="_blank" title="Instagram">
+                            <i class="bi bi-instagram fs-4"></i>
+                        </a>
                     </div>
                 </div>
             </div>
