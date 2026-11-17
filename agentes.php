@@ -20,6 +20,7 @@ $resultado = mysqli_query($conexion, $sql);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agentes - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
@@ -36,19 +37,35 @@ $resultado = mysqli_query($conexion, $sql);
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg mb-4">
+
+    <!-- NAVBAR ACTUALIZADA -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <!-- AQUÍ ESTÁ EL CAMBIO: ahora apunta a panel.php -->
-            <a class="navbar-brand" href="panel.php">Tapia's Solution</a>
-            
-            <div class="navbar-nav ms-auto align-items-center">
-                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?></span>
-                <a class="nav-link" href="logout.php">Cerrar Sesión</a>
+            <a class="navbar-brand d-flex align-items-center" href="panel.php">
+                <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
+                Tapia's Solution
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="panel.php"><i class="bi bi-house"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="panel.php"><i class="bi bi-speedometer2"></i> Panel Admin</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav align-items-center">
+                    <span class="nav-link me-3"><i class="bi bi-person-circle"></i> Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
+                    <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container mt-4">
         <?php if(isset($_GET["mensaje"])): ?>
             <div class="alert alert-success">Operación realizada con éxito.</div>
         <?php endif; ?>
@@ -95,5 +112,4 @@ $resultado = mysqli_query($conexion, $sql);
         </div>
     </div>
 
-    <!-- AQUI EMPIEZA EL FOOTER -->
     <?php include("footer.php"); ?>
