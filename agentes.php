@@ -91,5 +91,6 @@ $resultado = mysqli_query($conexion, $sql);
             </table>
         </div>
     </div>
+    <?php include("footer.php"); ?>
 </body>
 </html>

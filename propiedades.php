@@ -85,5 +85,6 @@ $resultado = mysqli_query($conexion, $consulta);
             </table>
         </div>
     </div>
+    <?php include("footer.php"); ?>
 </body>
 </html>
