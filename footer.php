@@ -1,5 +1,6 @@
-    <!-- Footer -->
-    <footer>
+    </div> <!-- Cerramos el contenedor principal de la página -->
+
+    <footer class="mt-auto">
         <div class="container">
             <div class="row text-center">
                 <div class="col-md-4 mb-3">
@@ -27,7 +28,7 @@
             </div>
         </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
