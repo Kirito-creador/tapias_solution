@@ -26,6 +26,8 @@ $resultado = mysqli_query($conexion, $sql);
     <title>Clientes - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <!-- Agregamos los iconos de Bootstrap para el footer -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; color: #3E2A1E; }
         h1, h2 { font-family: 'Playfair Display', serif; }
@@ -35,6 +37,16 @@ $resultado = mysqli_query($conexion, $sql);
         .btn-primary:hover { background-color: #a34225; }
         .table-dark { background-color: #3E2A1E; color: #F2EBDD; }
         .badge-activo { background-color: #6B6B43; color: white; }
+        
+        /* ESTILOS EXCLUSIVOS PARA EL FOOTER */
+        footer {
+            background-color: #3E2A1E;
+            color: #F2EBDD;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        footer a { color: #F2EBDD; text-decoration: none; }
+        footer h6 { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -105,6 +117,5 @@ $resultado = mysqli_query($conexion, $sql);
         </table>
     </div>
 </div>
+
 <?php include("footer.php"); ?>
-</body>
-</html>
