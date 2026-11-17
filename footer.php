@@ -1,6 +1,5 @@
-    </div> <!-- Cerramos el contenedor principal de la página -->
-
-    <footer class="mt-auto">
+    <!-- Footer -->
+    <footer>
         <div class="container">
             <div class="row text-center">
                 <div class="col-md-4 mb-3">
@@ -28,6 +27,37 @@
             </div>
         </div>
     </footer>
+
+    <style>
+        /* Esto asegura que el footer siempre esté abajo */
+        footer {
+            background-color: #3E2A1E;
+            color: #F2EBDD;
+            padding: 30px 0;
+            margin-top: auto !important; 
+        }
+        footer a { color: #F2EBDD; text-decoration: none; }
+        footer h6 { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+    </style>
+
+    <script>
+        // ESTE SCRIPT HACE LA MAGIA EN TODAS LAS PÁGINAS AUTOMÁTICAMENTE
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Convertimos el body en un contenedor Flex de altura completa
+            document.body.style.display = "flex";
+            document.body.style.flexDirection = "column";
+            document.body.style.minHeight = "100vh";
+
+            // 2. Buscamos los contenedores principales y les decimos que ocupen el espacio libre
+            let contenedores = document.querySelectorAll(".container, .container-fluid");
+            contenedores.forEach(function(div) {
+                // Evitamos aplicarlo al contenedor que está dentro del navbar o del footer
+                if (!div.closest('nav') && !div.closest('footer')) {
+                    div.style.flexGrow = "1";
+                }
+            });
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
