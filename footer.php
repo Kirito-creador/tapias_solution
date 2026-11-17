@@ -1,3 +1,4 @@
+    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="row text-center">
@@ -14,15 +15,9 @@
                 <div class="col-md-4 mb-3">
                     <h6>Contacto</h6>
                     <div class="d-flex justify-content-center gap-3 mt-2">
-                        <a href="https://wa.me/59169172830" target="_blank" title="WhatsApp">
-                            <i class="bi bi-whatsapp fs-4"></i>
-                        </a>
-                        <a href="https://www.facebook.com/share/1HmqoGDtrb/" target="_blank" title="Facebook">
-                            <i class="bi bi-facebook fs-4"></i>
-                        </a>
-                        <a href="https://www.instagram.com/tapiasolution?stkn=NXRxem8xNHoxazJ1" target="_blank" title="Instagram">
-                            <i class="bi bi-instagram fs-4"></i>
-                        </a>
+                        <a href="https://wa.me/59169172830" target="_blank" title="WhatsApp"><i class="bi bi-whatsapp fs-4"></i></a>
+                        <a href="https://www.facebook.com/share/1HmqoGDtrb/" target="_blank" title="Facebook"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="https://www.instagram.com/tapiasolution?stkn=NXRxem8xNHoxazJ1" target="_blank" title="Instagram"><i class="bi bi-instagram fs-4"></i></a>
                     </div>
                 </div>
             </div>
@@ -32,8 +27,3 @@
             </div>
         </div>
     </footer>
-
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
