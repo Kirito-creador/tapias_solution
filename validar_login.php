@@ -16,25 +16,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_num_rows($resultado) > 0) {
         $usuario = mysqli_fetch_assoc($resultado);
 
-        // Se asume que las contraseñas están en texto plano por tu código original
+        // Comparación directa (asumiendo que tus contraseñas están en texto plano)
         if ($password == $usuario['password_hash']) {
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nombre'] = $usuario['nombre_completo'];
             $_SESSION['rol'] = $usuario['nombre_rol'];
 
-            // REDIRECCIÓN SEGÚN EL ROL
-            if ($usuario['nombre_rol'] == 'Administrador') {
-                header("Location: panel.php");
-            } elseif ($usuario['nombre_rol'] == 'Agente') {
-                header("Location: panel_agente.php"); // Redirige al panel de agentes
-            } elseif ($usuario['nombre_rol'] == 'Cliente') {
-                // Como el archivo panel_cliente.php no existe, te recomiendo crearlo. 
-                // Por ahora, si intentan entrar como cliente, los manda al index.
+            // Lógica de redirección según el rol
+            if ($_SESSION['rol'] == 'Administrador') {
+                header("Location: panel.php"); // El admin sí va a panel.php
+                exit();
+            } elseif ($_SESSION['rol'] == 'Agente') {
+                header("Location: panel_agente.php"); // El agente va a su propio panel
+                exit();
+            } elseif ($_SESSION['rol'] == 'Cliente') {
+                // Aún no tienes panel_cliente.php, así que puedes mandarlos temporalmente al index o login
+                // Si ya lo creas, cambia esto a: header("Location: panel_cliente.php");
                 header("Location: index.php"); 
+                exit();
             } else {
-                header("Location: panel.php"); // Por defecto
+                // Por si hay otro rol desconocido
+                header("Location: login.php");
+                exit();
             }
-            exit();
 
         } else {
             $_SESSION['error'] = "Contraseña incorrecta.";
