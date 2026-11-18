@@ -17,6 +17,8 @@ $resultado = mysqli_query($conexion, $consulta);
     <meta charset="UTF-8">
     <title>Mis Propiedades - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; }
         h2 { font-family: 'Playfair Display', serif; color: #3E2A1E; }
@@ -30,7 +32,10 @@ $resultado = mysqli_query($conexion, $consulta);
 <body>
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
-            <a class="navbar-brand" href="panel_agente.php">Tapia's Solution</a>
+            <a class="navbar-brand d-flex align-items-center" href="panel_agente.php">
+                <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
+                Tapia's Solution
+            </a>
             <div class="navbar-nav ms-auto align-items-center">
                 <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?></span>
                 <a class="nav-link" href="logout.php">Cerrar Sesión</a>
@@ -64,7 +69,6 @@ $resultado = mysqli_query($conexion, $consulta);
                                 <td><?= $fila['precio'] ?> <?= $fila['moneda'] ?></td>
                                 <td><span class="badge badge-disponible"><?= $fila['estado'] ?></span></td>
                                 <td>
-                                    <!-- Solo Ver y Editar -->
                                     <a href="detalle_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn btn-sm btn-info text-white">Ver</a>
                                     <a href="editar_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn btn-sm btn-warning">Editar</a>
                                 </td>
@@ -79,5 +83,7 @@ $resultado = mysqli_query($conexion, $consulta);
             </table>
         </div>
     </div>
+    <?php include("footer.php"); ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
