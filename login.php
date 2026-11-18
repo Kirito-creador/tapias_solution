@@ -6,10 +6,11 @@ if (isset($_SESSION['rol'])) {
     } elseif ($_SESSION['rol'] == 'agente') {
         header("Location: panel_agente.php");
     }
-    exit();
+    exit(); // <-- Este exit debe estar aquí
 }
 ?>
 <!DOCTYPE html>
+...
 <html lang="es">
 <head>
     <meta charset="UTF-8">
