@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nombre'] = $usuario['nombre_completo'];
             $_SESSION['rol'] = $usuario['nombre_rol'];
+            die("El rol que leyó de la base de datos es: " . $_SESSION['rol']);
 
             // Redirección solo para Admin y Agente
             if ($_SESSION['rol'] == 'admin') {
