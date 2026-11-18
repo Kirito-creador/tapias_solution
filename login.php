@@ -1,12 +1,21 @@
 <?php
 session_start();
 if (isset($_SESSION['rol'])) {
-    header("Location: panel.php");
+    // Si ya está logueado, lo mandamos a su panel correspondiente
+    if ($_SESSION['rol'] == 'Administrador') {
+        header("Location: panel.php");
+    } elseif ($_SESSION['rol'] == 'Agente') {
+        header("Location: panel_agente.php");
+    } elseif ($_SESSION['rol'] == 'Cliente') {
+        header("Location: panel_cliente.php"); // O index.php si aún no lo creas
+    } else {
+        header("Location: panel.php");
+    }
     exit();
 }
 ?>
 <!DOCTYPE html>
-...
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
