@@ -1,5 +1,5 @@
 <?php
-session_start();   //iniciz o reanuda una sesion que permite guardar datos del usuario entre distintas paginas
+session_start();   
 include("conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -16,13 +16,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_num_rows($resultado) > 0) {
         $usuario = mysqli_fetch_assoc($resultado);
 
+        // Se asume que las contraseñas están en texto plano por tu código original
         if ($password == $usuario['password_hash']) {
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nombre'] = $usuario['nombre_completo'];
             $_SESSION['rol'] = $usuario['nombre_rol'];
 
-            header("Location: panel.php");
+            // REDIRECCIÓN SEGÚN EL ROL
+            if ($usuario['nombre_rol'] == 'Administrador') {
+                header("Location: panel.php");
+            } elseif ($usuario['nombre_rol'] == 'Agente') {
+                header("Location: panel_agente.php"); // Redirige al panel de agentes
+            } elseif ($usuario['nombre_rol'] == 'Cliente') {
+                // Como el archivo panel_cliente.php no existe, te recomiendo crearlo. 
+                // Por ahora, si intentan entrar como cliente, los manda al index.
+                header("Location: index.php"); 
+            } else {
+                header("Location: panel.php"); // Por defecto
+            }
             exit();
+
         } else {
             $_SESSION['error'] = "Contraseña incorrecta.";
             header("Location: login.php");
