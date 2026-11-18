@@ -23,14 +23,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['rol'] = $usuario['nombre_rol'];
 
             // Redirección según el rol (ahora en minúsculas)
-            if ($_SESSION['rol'] == 'admin') {
-                header("Location: panel.php"); 
-            } elseif ($_SESSION['rol'] == 'agente') {
-                header("Location: panel_agente.php"); 
-            } elseif ($_SESSION['rol'] == 'cliente') {
-                // Si el panel de cliente aún no existe, puedes mandarlo al login con un mensaje
-                $_SESSION['error'] = "El panel de clientes aún no está disponible.";
-                header("Location: login.php");
+           if ($_SESSION['rol'] == 'admin') {
+    header("Location: panel.php"); 
+} elseif ($_SESSION['rol'] == 'agente') {
+    header("Location: panel_agente.php"); 
+} elseif ($_SESSION['rol'] == 'cliente') {
+    $_SESSION['error'] = "El panel de clientes aún no está disponible.";
+    header("Location: login.php");
+
             } else {
                 // Por si hay algún rol desconocido
                 header("Location: login.php");

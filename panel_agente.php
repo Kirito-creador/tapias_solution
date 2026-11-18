@@ -9,7 +9,12 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Contadores para las tarjetas
+// --- NOTIFICACIONES (Contar no leídas) ---
+$sql_noti_count = "SELECT COUNT(*) as total FROM notificacion WHERE id_usuario = $id_agente AND leida = FALSE";
+$res_noti_count = mysqli_query($conexion, $sql_noti_count);
+$total_notificaciones = mysqli_fetch_assoc($res_noti_count)['total'];
+
+// --- CONTADORES DE PROPIEDADES ---
 $total_propiedades = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente"))['total'];
 $disponibles = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Disponible'"))['total'];
 $vendidas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'"))['total'];
@@ -40,9 +45,12 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
         .btn-olive { background-color: #6B6B43; color: white; border: none; font-weight: 600; padding: 15px; }
         .btn-olive:hover { background-color: #555533; color: white; }
         .comision-box { background-color: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .btn-notificacion { background-color: transparent; border: 1px solid #C1512F; color: #C1512F; border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s; }
-        .btn-notificacion:hover { background-color: #C1512F; color: white; }
-        .badge-noti { background-color: #6B6B43; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
+        
+        /* Estilo del botón de notificación en la barra */
+        .nav-noti { position: relative; display: inline-block; margin-right: 20px; }
+        .btn-noti { background: transparent; border: none; color: #F2EBDD; font-size: 1.4rem; position: relative; padding: 5px 10px; transition: 0.3s; }
+        .btn-noti:hover { color: #C1512F; }
+        .badge-noti-burbuja { position: absolute; top: -2px; right: -5px; background-color: #C1512F; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; border: 2px solid #3E2A1E; }
     </style>
 </head>
 <body>
@@ -52,14 +60,21 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
                 <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
                 Tapia's Solution
             </a>
-            <div class="navbar-nav ms-auto align-items-center gap-3">
-                <!-- Botón de Notificaciones (No funcional) -->
-                <a href="#" class="btn-notificacion">
-                    <i class="bi bi-bell"></i> Notificaciones
-                    <span class="badge-noti">2 nuevas</span>
-                </a>
+            
+            <div class="navbar-nav ms-auto align-items-center">
                 
-                <span class="nav-link">Hola, <?= $_SESSION['nombre'] ?> (Agente)</span>
+                <!-- BOTÓN DE NOTIFICACIONES (Redirige a notificaciones.php) -->
+                <div class="nav-noti">
+                    <a href="notificaciones.php" class="btn-noti">
+                        <i class="bi bi-bell-fill"></i>
+                        <?php if ($total_notificaciones > 0): ?>
+                            <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+                <!-- FIN BOTÓN NOTIFICACIONES -->
+
+                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?></span>
                 <a class="nav-link" href="logout.php">Cerrar Sesión</a>
             </div>
         </div>
