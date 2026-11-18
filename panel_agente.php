@@ -9,7 +9,17 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Contadores para las tarjetas
+// --- NOTIFICACIONES ---
+// Contar notificaciones no leídas
+$sql_noti_count = "SELECT COUNT(*) as total FROM notificacion WHERE id_usuario = $id_agente AND leida = FALSE";
+$res_noti_count = mysqli_query($conexion, $sql_noti_count);
+$total_notificaciones = mysqli_fetch_assoc($res_noti_count)['total'];
+
+// Obtener las últimas 5 notificaciones (leídas o no) para mostrar en el dropdown
+$sql_notis = "SELECT * FROM notificacion WHERE id_usuario = $id_agente ORDER BY fecha_envio DESC LIMIT 5";
+$res_notis = mysqli_query($conexion, $sql_notis);
+
+// --- CONTADORES DE PROPIEDADES ---
 $total_propiedades = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente"))['total'];
 $disponibles = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Disponible'"))['total'];
 $vendidas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'"))['total'];
@@ -40,9 +50,24 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
         .btn-olive { background-color: #6B6B43; color: white; border: none; font-weight: 600; padding: 15px; }
         .btn-olive:hover { background-color: #555533; color: white; }
         .comision-box { background-color: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .btn-notificacion { background-color: transparent; border: 1px solid #C1512F; color: #C1512F; border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s; }
-        .btn-notificacion:hover { background-color: #C1512F; color: white; }
-        .badge-noti { background-color: #6B6B43; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
+        
+        /* Estilos del botón de notificaciones */
+        .nav-noti { position: relative; display: inline-block; margin-right: 20px; }
+        .btn-noti { background: transparent; border: none; color: #F2EBDD; font-size: 1.4rem; position: relative; padding: 5px 10px; transition: 0.3s; }
+        .btn-noti:hover { color: #C1512F; }
+        .badge-noti-burbuja { position: absolute; top: -2px; right: -5px; background-color: #C1512F; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; border: 2px solid #3E2A1E; }
+        
+        /* Estilos del dropdown de notificaciones */
+        .dropdown-menu-noti { width: 320px; padding: 0; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: none; }
+        .dropdown-header { background-color: #3E2A1E; color: #F2EBDD; padding: 12px 15px; border-radius: 8px 8px 0 0; font-weight: 600; font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+        .noti-item { padding: 12px 15px; border-bottom: 1px solid #eee; display: block; text-decoration: none; color: #3E2A1E; transition: 0.2s; }
+        .noti-item:hover { background-color: #f8f9fa; color: #C1512F; }
+        .noti-item.no-leida { background-color: #fff8f0; border-left: 4px solid #C1512F; }
+        .noti-item .noti-tipo { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #6B6B43; display: block; margin-bottom: 2px; }
+        .noti-item .noti-mensaje { font-size: 0.9rem; line-height: 1.3; margin: 0; }
+        .noti-item .noti-fecha { font-size: 0.7rem; color: #999; margin-top: 4px; display: block; }
+        .dropdown-footer { padding: 10px; text-align: center; background-color: #f8f9fa; border-radius: 0 0 8px 8px; font-size: 0.85rem; }
+        .dropdown-footer a { color: #C1512F; font-weight: 600; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -52,14 +77,44 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
                 <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
                 Tapia's Solution
             </a>
-            <div class="navbar-nav ms-auto align-items-center gap-3">
-                <!-- Botón de Notificaciones (No funcional) -->
-                <a href="#" class="btn-notificacion">
-                    <i class="bi bi-bell"></i> Notificaciones
-                    <span class="badge-noti">2 nuevas</span>
-                </a>
+            
+            <!-- Contenedor derecho de la barra de navegación -->
+            <div class="navbar-nav ms-auto align-items-center">
                 
-                <span class="nav-link">Hola, <?= $_SESSION['nombre'] ?> (Agente)</span>
+                <!-- BOTÓN DE NOTIFICACIONES (Dropdown) -->
+                <div class="dropdown nav-noti">
+                    <button class="btn-noti dropdown-toggle" type="button" id="dropdownNotis" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell-fill"></i>
+                        <?php if ($total_notificaciones > 0): ?>
+                            <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
+                        <?php endif; ?>
+                    </button>
+                    
+                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-noti" aria-labelledby="dropdownNotis">
+                        <div class="dropdown-header">
+                            Notificaciones
+                        </div>
+                        
+                        <?php if (mysqli_num_rows($res_notis) > 0): ?>
+                            <?php while($noti = mysqli_fetch_assoc($res_notis)): ?>
+                                <a href="#" class="noti-item <?= $noti['leida'] ? '' : 'no-leida' ?>">
+                                    <span class="noti-tipo"><?= htmlspecialchars($noti['tipo']) ?></span>
+                                    <p class="noti-mensaje"><?= htmlspecialchars($noti['mensaje']) ?></p>
+                                    <span class="noti-fecha"><?= date('d/m/Y H:i', strtotime($noti['fecha_envio'])) ?></span>
+                                </a>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="text-center py-4 text-muted" style="font-size: 0.9rem;">No tienes notificaciones.</div>
+                        <?php endif; ?>
+
+                        <div class="dropdown-footer">
+                            <a href="marcar_notificaciones.php">Marcar todas como leídas</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN BOTÓN NOTIFICACIONES -->
+
+                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?></span>
                 <a class="nav-link" href="logout.php">Cerrar Sesión</a>
             </div>
         </div>
