@@ -1,12 +1,8 @@
 <?php
 session_start();
 if (isset($_SESSION['rol'])) {
-    if ($_SESSION['rol'] == 'admin') {
-        header("Location: panel.php");
-    } elseif ($_SESSION['rol'] == 'agente') {
-        header("Location: panel_agente.php");
-    }
-    exit(); // <-- Este exit debe estar aquí
+    header("Location: panel.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
