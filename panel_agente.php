@@ -26,6 +26,7 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
     <title>Panel del Agente - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; color: #3E2A1E; }
         .navbar { background-color: #3E2A1E; }
@@ -34,19 +35,31 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
         .card-stat { border: none; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; padding: 20px; background: white; }
         .card-stat h5 { color: #6B6B43; font-weight: 600; }
         .card-stat h1 { font-family: 'Playfair Display', serif; color: #3E2A1E; font-size: 3rem; margin: 0; }
-        .btn-terracotta { background-color: #C1512F; color: white; border: none; }
+        .btn-terracotta { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 15px; }
         .btn-terracotta:hover { background-color: #a34225; color: white; }
-        .btn-olive { background-color: #6B6B43; color: white; border: none; }
+        .btn-olive { background-color: #6B6B43; color: white; border: none; font-weight: 600; padding: 15px; }
         .btn-olive:hover { background-color: #555533; color: white; }
         .comision-box { background-color: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-notificacion { background-color: transparent; border: 1px solid #C1512F; color: #C1512F; border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s; }
+        .btn-notificacion:hover { background-color: #C1512F; color: white; }
+        .badge-noti { background-color: #6B6B43; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
-            <a class="navbar-brand" href="#">Tapia's Solution</a>
-            <div class="navbar-nav ms-auto align-items-center">
-                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?> (Agente)</span>
+            <a class="navbar-brand d-flex align-items-center" href="panel_agente.php">
+                <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
+                Tapia's Solution
+            </a>
+            <div class="navbar-nav ms-auto align-items-center gap-3">
+                <!-- Botón de Notificaciones (No funcional) -->
+                <a href="#" class="btn-notificacion">
+                    <i class="bi bi-bell"></i> Notificaciones
+                    <span class="badge-noti">2 nuevas</span>
+                </a>
+                
+                <span class="nav-link">Hola, <?= $_SESSION['nombre'] ?> (Agente)</span>
                 <a class="nav-link" href="logout.php">Cerrar Sesión</a>
             </div>
         </div>
@@ -67,20 +80,22 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
         <!-- Comisión -->
         <div class="comision-box mb-4">
             <h5 class="fw-bold">Mi Comisión Total</h5>
-            <h1 style="color: #6B6B43; font-family: 'Playfair Display', serif;">$<?= number_format($comision, 2) ?></h1>
+            <h1 style="color: #1e6b42; font-family: 'Playfair Display', serif;">$<?= number_format($comision, 2) ?></h1>
         </div>
 
         <!-- Botones de Acción -->
         <div class="row">
             <div class="col-md-6 mb-3">
-                <a href="registrar_propiedad.php" class="btn btn-terracotta w-100 py-3 mb-2">+ Registrar Nueva Propiedad</a>
-                <a href="citas_agente.php" class="btn btn-terracotta w-100 py-3">Ver Mis Citas</a>
+                <a href="registrar_propiedad.php" class="btn btn-terracotta w-100 mb-3"><i class="bi bi-plus-circle"></i> Registrar Nueva Propiedad</a>
+                <a href="citas_agente.php" class="btn btn-terracotta w-100"><i class="bi bi-calendar-check"></i> Ver Mis Citas</a>
             </div>
             <div class="col-md-6 mb-3">
-                <a href="propiedades_agente.php" class="btn btn-olive w-100 py-3 mb-2">= Ver Mis Propiedades</a>
-                <a href="agendar_cita.php" class="btn btn-olive w-100 py-3">+ Agendar Visita</a>
+                <a href="propiedades_agente.php" class="btn btn-olive w-100 mb-3"><i class="bi bi-list-ul"></i> Ver Mis Propiedades</a>
+                <a href="agendar_cita.php" class="btn btn-olive w-100"><i class="bi bi-calendar-plus"></i> Agendar Visita</a>
             </div>
         </div>
     </div>
+    <?php include("footer.php"); ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
