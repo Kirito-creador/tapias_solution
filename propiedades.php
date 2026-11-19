@@ -103,13 +103,11 @@ $resultado = mysqli_query($conexion, $consulta);
                                 <td><?= $fila['tipo_operacion'] ?></td>
                                 <td><?= $fila['fecha_cierre'] ? date('d/m/Y', strtotime($fila['fecha_cierre'])) : '-' ?></td>
                                 <td>
-                                    <!-- Botones de acción -->
                                     <a href="detalle_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn-accion" title="Ver"><i class="bi bi-eye"></i></a>
                                     
                                     <?php if ($estado == 'disponible'): ?>
-                                        <!-- Botón de Cerrar Operación (Solo si está disponible) -->
-                                        <a href="cerrar_operacion.php?id=<?= $fila['id_propiedad'] ?>" class="btn-accion cerrar" title="Cerrar Operación"><i class="bi bi-handshake"></i></a>
-                                    <?php endif; ?>
+                                        <a href="cerrar_operacion.php?id=<?= $fila['id_propiedad'] ?>" class="btn-accion cerrar" title="Cerrar Operación" style="color: #28a745; border-color: #28a745; background-color: #f0fff4;"><i class="bi bi-check2-square"></i></a>    
+                                        <?php endif; ?>
 
                                     <a href="editar_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn-accion" title="Editar"><i class="bi bi-pencil"></i></a>
                                     <a href="eliminar_propiedad.php?id=<?= $fila['id_propiedad'] ?>" class="btn-accion" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta propiedad?');"><i class="bi bi-trash"></i></a>
