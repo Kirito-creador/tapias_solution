@@ -7,7 +7,7 @@ if (isset($_SESSION['rol'])) {
     } elseif ($_SESSION['rol'] == 'Agente') {
         header("Location: panel_agente.php");
     } elseif ($_SESSION['rol'] == 'Cliente') {
-        header("Location: login.php"); // O index.php si aún no lo creas
+        header("Location: panel_cliente.php"); // O index.php si aún no lo creas
     } else {
         header("Location: panel.php");
     }
