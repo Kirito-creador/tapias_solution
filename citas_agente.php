@@ -9,11 +9,11 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Consultar citas del agente con los datos del cliente y propiedad
+// Consultar citas del agente (unificando los datos)
 $sql = "SELECT c.id_cita, c.fecha_cita, c.hora_inicio, c.hora_fin,
                cli.nombre_completo AS cliente_nombre, cli.telefono AS cliente_telefono, cli.email AS cliente_email,
                p.tipo AS prop_tipo, p.zona AS prop_zona,
-               ec.nombre_estado AS estado_actual
+               ec.nombre_estado AS estado_actual, c.id_estado_cita
         FROM cita c
         INNER JOIN cliente cli ON c.id_cliente = cli.id_cliente
         INNER JOIN propiedad p ON c.id_propiedad = p.id_propiedad
@@ -23,13 +23,12 @@ $sql = "SELECT c.id_cita, c.fecha_cita, c.hora_inicio, c.hora_fin,
 
 $resultado = mysqli_query($conexion, $sql);
 
-// Contadores para las tarjetas
+// Contadores para las tarjetas superiores
 $pendientes = 0;
 $confirmadas = 0;
 $canceladas = 0;
-
-// Guardamos los datos en un array para no tener que consultar dos veces
 $citas = [];
+
 while ($fila = mysqli_fetch_assoc($resultado)) {
     $citas[] = $fila;
     $estado = strtolower($fila['estado_actual']);
@@ -59,34 +58,35 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
         
         .card-stat { 
-            background-color: #ffffff; 
-            border: 1px solid #E0D4CD; 
-            border-radius: 8px; 
-            padding: 20px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
+            background-color: #ffffff; border: 1px solid #E0D4CD; border-radius: 8px; 
+            padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
         }
         .card-stat h5 { font-weight: 700; color: #3E2A1E; font-size: 1.1rem; }
-        .card-stat h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin: 0; }
-        .text-pendiente { color: #C1512F; }
-        .text-confirmada { color: #C1512F; }
-        .text-cancelada { color: #C1512F; }
+        .card-stat h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin: 0; color: #C1512F; }
 
         .table-container { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .table-custom thead { background-color: #3E2A1E; color: white; }
-        .table-custom thead th { font-weight: 600; padding: 15px; border: none; }
+        .table-custom thead th { font-weight: 600; padding: 15px; border: none; font-size: 0.95rem; }
         .table-custom tbody td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #E0D4CD; }
         
-        .cliente-info { font-weight: 600; }
+        .cliente-info { font-weight: 700; color: #3E2A1E; }
         .cliente-sub { font-size: 0.85rem; color: #7A6B63; }
         
-        .badge-estado { padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; color: white; }
-        .bg-pendiente { background-color: #6B6B43; }
-        .bg-confirmada { background-color: #C1512F; }
-        .bg-completada { background-color: #6B6B43; }
-        .bg-cancelada { background-color: #555555; }
+        .badge-estado { padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: 700; color: white; }
+        .bg-pendiente { background-color: #6B6B43; } /* Verde Oliva */
+        .bg-confirmada { background-color: #C1512F; } /* Terracota */
+        .bg-completada { background-color: #6B6B43; } /* Verde Oliva */
+        .bg-cancelada { background-color: #555555; } /* Gris */
 
-        .btn-accion { background-color: transparent; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; color: #3E2A1E; transition: 0.3s; }
-        .btn-accion:hover { background-color: #f0f0f0; }
+        /* Botones de acción cuadrados */
+        .btn-accion { 
+            background-color: transparent; border: 1px solid #ccc; border-radius: 4px; 
+            padding: 5px 8px; color: #555; transition: 0.3s; display: inline-flex; 
+            align-items: center; justify-content: center; text-decoration: none;
+        }
+        .btn-accion:hover { background-color: #f0f0f0; color: #3E2A1E; border-color: #999; }
+        .btn-accion.confirmar:hover { color: #C1512F; border-color: #C1512F; }
+        .btn-accion.cancelar:hover { color: #dc3545; border-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -142,6 +142,7 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
                         <th>Fecha</th>
                         <th>Hora</th>
                         <th>Cliente</th>
+                        <th>Teléfono</th>
                         <th>Propiedad</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -155,9 +156,9 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
                                 <td><?= date('H:i', strtotime($cita['hora_inicio'])) ?> - <?= date('H:i', strtotime($cita['hora_fin'])) ?></td>
                                 <td>
                                     <div class="cliente-info"><?= htmlspecialchars($cita['cliente_nombre']) ?></div>
-                                    <div class="cliente-sub"><?= htmlspecialchars($cita['cliente_telefono']) ?></div>
                                     <div class="cliente-sub"><?= htmlspecialchars($cita['cliente_email']) ?></div>
                                 </td>
+                                <td><?= htmlspecialchars($cita['cliente_telefono']) ?></td>
                                 <td><?= htmlspecialchars($cita['prop_tipo']) ?> en <?= htmlspecialchars($cita['prop_zona']) ?></td>
                                 <td>
                                     <?php
@@ -170,16 +171,24 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
                                     <span class="badge-estado <?= $clase ?>"><?= htmlspecialchars($cita['estado_actual']) ?></span>
                                 </td>
                                 <td>
-                                    <!-- Botones de acción (solo visuales por ahora) -->
-                                    <button class="btn-accion" title="Confirmar"><i class="bi bi-check-circle"></i></button>
-                                    <button class="btn-accion" title="Reprogramar"><i class="bi bi-calendar-event"></i></button>
-                                    <button class="btn-accion" title="Cancelar"><i class="bi bi-x-circle"></i></button>
+                                    <!-- Botones de acción: Confirmar, Completar, Cancelar -->
+                                    <?php if ($estado == 'pendiente'): ?>
+                                        <a href="cambiar_estado_cita.php?id=<?= $cita['id_cita'] ?>&estado=2" class="btn-accion confirmar" title="Confirmar Cita"><i class="bi bi-check-circle"></i></a>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($estado == 'confirmada' || $estado == 'pendiente'): ?>
+                                        <a href="cambiar_estado_cita.php?id=<?= $cita['id_cita'] ?>&estado=3" class="btn-accion" title="Completar Visita"><i class="bi bi-check2-square"></i></a>
+                                    <?php endif; ?>
+
+                                    <?php if ($estado != 'cancelada' && $estado != 'completada'): ?>
+                                        <a href="cambiar_estado_cita.php?id=<?= $cita['id_cita'] ?>&estado=4" class="btn-accion cancelar" title="Cancelar Cita" onclick="return confirm('¿Seguro que deseas cancelar esta cita?');"><i class="bi bi-x-circle"></i></a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4">No tienes citas registradas.</td>
+                            <td colspan="7" class="text-center py-4">No tienes citas registradas.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

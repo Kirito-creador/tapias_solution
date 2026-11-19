@@ -9,8 +9,8 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Obtener clientes (puedes filtrar si solo quieres los que tienen citas o todos)
-$sql_clientes = "SELECT id_cliente, nombre_completo FROM cliente ORDER BY nombre_completo ASC";
+// Obtener clientes registrados
+$sql_clientes = "SELECT id_cliente, nombre_completo, telefono FROM cliente ORDER BY nombre_completo ASC";
 $res_clientes = mysqli_query($conexion, $sql_clientes);
 
 // Obtener propiedades del agente
@@ -26,23 +26,19 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        :root {
-            --bg-color: #F5EFEB;
-            --navbar-bg: #3E2A1E;
-            --btn-color: #C1512F;
-            --text-color: #3E2A1E;
-        }
+        :root { --bg-color: #F5EFEB; --navbar-bg: #3E2A1E; --btn-color: #C1512F; --text-color: #3E2A1E; }
         body { background-color: var(--bg-color); font-family: 'Nunito Sans', sans-serif; color: var(--text-color); }
         .navbar { background-color: var(--navbar-bg); }
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
         
-        .alert-custom { background-color: #6B6B43; color: white; border: none; border-radius: 5px; padding: 15px; }
+        .alert-custom { background-color: #6B6B43; color: white; border: none; border-radius: 5px; padding: 15px; font-size: 0.95rem; }
         
         .card-form { background-color: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; }
-        .form-label { font-weight: 600; color: #3E2A1E; }
+        .form-label { font-weight: 600; color: #3E2A1E; font-size: 0.95rem; }
         .form-control, .form-select { border: 1px solid #ccc; border-radius: 5px; padding: 10px; }
-        .btn-registrar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; width: 100%; border-radius: 5px; }
+        
+        .btn-registrar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 5px; }
         .btn-registrar:hover { background-color: #a34225; color: white; }
         .btn-volver { background-color: transparent; color: #C1512F; border: 1px solid #C1512F; font-weight: 600; padding: 8px 20px; border-radius: 5px; text-decoration: none; }
         .btn-volver:hover { background-color: #C1512F; color: white; }
@@ -78,23 +74,44 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                 <div class="card-form">
                     <form action="registrar_cita.php" method="POST">
                         
-                        <!-- Cliente -->
+                        <!-- Selección de tipo de cliente -->
                         <div class="mb-4">
                             <label class="form-label"><i class="bi bi-person"></i> Cliente</label>
                             <div class="form-check form-check-inline mt-2">
-                                <input class="form-check-input" type="radio" name="tipo_cliente" id="cliente_reg" value="registrado" checked>
+                                <input class="form-check-input" type="radio" name="tipo_cliente" id="cliente_reg" value="registrado" checked onchange="toggleFormulario()">
                                 <label class="form-check-label" for="cliente_reg">Cliente registrado</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="tipo_cliente" id="cliente_whatsapp" value="whatsapp">
+                                <input class="form-check-input" type="radio" name="tipo_cliente" id="cliente_whatsapp" value="whatsapp" onchange="toggleFormulario()">
                                 <label class="form-check-label" for="cliente_whatsapp">Cliente sin cuenta (WhatsApp)</label>
                             </div>
-                            <select name="id_cliente" class="form-select mt-2" required>
-                                <option value="">-- Selecciona un cliente --</option>
-                                <?php while($cli = mysqli_fetch_assoc($res_clientes)): ?>
-                                    <option value="<?= $cli['id_cliente'] ?>"><?= htmlspecialchars($cli['nombre_completo']) ?></option>
-                                <?php endwhile; ?>
-                            </select>
+                        </div>
+
+                        <!-- FORMULARIO 1: Cliente Registrado -->
+                        <div id="form_registrado">
+                            <div class="mb-4">
+                                <select name="id_cliente" class="form-select" id="select_cliente" required>
+                                    <option value="">-- Selecciona un cliente --</option>
+                                    <?php while($cli = mysqli_fetch_assoc($res_clientes)): ?>
+                                        <option value="<?= $cli['id_cliente'] ?>"><?= htmlspecialchars($cli['nombre_completo']) ?> (<?= htmlspecialchars($cli['telefono']) ?>)</option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- FORMULARIO 2: Cliente sin cuenta (WhatsApp/Facebook) -->
+                        <div id="form_whatsapp" style="display: none;">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <input type="text" name="nombre_manual" class="form-control" placeholder="Nombre del cliente">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="telefono_manual" class="form-control" placeholder="Teléfono (WhatsApp)">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <input type="email" name="email_manual" class="form-control" placeholder="Email (opcional)">
+                            </div>
                         </div>
 
                         <!-- Propiedad -->
@@ -135,5 +152,35 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
 
     <?php include("footer.php"); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script para cambiar entre formularios -->
+    <script>
+        function toggleFormulario() {
+            const formReg = document.getElementById('form_registrado');
+            const formWpp = document.getElementById('form_whatsapp');
+            const radioReg = document.getElementById('cliente_reg');
+            
+            // Manejar los campos 'required' para que no bloqueen el envío
+            const selectCli = document.getElementById('select_cliente');
+            const nombreManual = document.querySelector('input[name="nombre_manual"]');
+            const telefonoManual = document.querySelector('input[name="telefono_manual"]');
+
+            if (radioReg.checked) {
+                formReg.style.display = 'block';
+                formWpp.style.display = 'none';
+                selectCli.setAttribute('required', 'required');
+                nombreManual.removeAttribute('required');
+                telefonoManual.removeAttribute('required');
+            } else {
+                formReg.style.display = 'none';
+                formWpp.style.display = 'block';
+                selectCli.removeAttribute('required');
+                nombreManual.setAttribute('required', 'required');
+                telefonoManual.setAttribute('required', 'required');
+            }
+        }
+        // Ejecutar al cargar la página
+        toggleFormulario();
+    </script>
 </body>
 </html>
