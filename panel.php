@@ -139,7 +139,7 @@ $ganancia_neta = $comision_empresa; // En este caso la ganancia neta para la emp
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="panel.php"><i class="bi bi-house"></i> Inicio</a>
+                        <a class="nav-link" href="Index.php"><i class="bi bi-house"></i> Inicio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Panel Admin</a>
