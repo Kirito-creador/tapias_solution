@@ -10,28 +10,56 @@ if (!isset($_SESSION['rol']) || ($_SESSION['rol'] != 'Administrador' && $_SESSIO
 if (!isset($_GET['id'])) { header("Location: panel.php"); exit(); }
 $id = intval($_GET['id']);
 
+// 1. Obtener datos de la propiedad
 $sql = "SELECT p.*, u.nombre_completo FROM propiedad p INNER JOIN usuario u ON p.id_agente = u.id_usuario WHERE p.id_propiedad = $id";
 $res = mysqli_query($conexion, $sql);
 $prop = mysqli_fetch_assoc($res);
 
 if (!$prop) { die("Propiedad no encontrada."); }
+
+// 2. Buscar la imagen principal de esta propiedad
+$sql_img = "SELECT url_imagen FROM imagen_propiedad WHERE id_propiedad = $id AND es_principal = 1 LIMIT 1";
+$res_img = mysqli_query($conexion, $sql_img);
+$img = mysqli_fetch_assoc($res_img);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Detalle Propiedad</title>
+    <title>Detalle Propiedad - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style> body { background-color: #F2EBDD; } .card-header { background-color: #3E2A1E; color: #F2EBDD; font-family: 'Playfair Display', serif;} </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <style> 
+        body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; } 
+        .card-header { background-color: #3E2A1E; color: #F2EBDD; font-family: 'Playfair Display', serif;} 
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-5 mb-5">
         <div class="card shadow mx-auto" style="max-width: 700px;">
+            
+            <!-- Encabezado de la tarjeta -->
             <div class="card-header py-3">
                 <h3 class="mb-0">Detalle de la Propiedad</h3>
             </div>
+            
             <div class="card-body p-4">
+                <!-- Título de la propiedad -->
                 <h4 class="text-dark mb-3"><?= $prop['tipo'] ?> en <?= $prop['tipo_operacion'] ?></h4>
+                
+                <!-- ========================================== -->
+                <!-- AQUÍ VA LA IMAGEN (JUSTO DEBAJO DEL TÍTULO) -->
+                <!-- ========================================== -->
+                <?php if(isset($img['url_imagen']) && !empty($img['url_imagen'])): ?>
+                    <div class="text-center mb-4">
+                        <img src="<?= $img['url_imagen'] ?>" class="img-fluid rounded shadow-sm" alt="Foto de la propiedad" style="max-height: 350px; width: 100%; object-fit: cover;">
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-secondary text-center mb-4">Esta propiedad no tiene imágenes subidas.</div>
+                <?php endif; ?>
+                <!-- ========================================== -->
+                
+                <!-- Lista de detalles -->
                 <ul class="list-group list-group-flush mb-4">
                     <li class="list-group-item"><strong>Zona:</strong> <?= $prop['zona'] ?></li>
                     <li class="list-group-item"><strong>Dirección:</strong> <?= $prop['direccion'] ?></li>
@@ -42,6 +70,8 @@ if (!$prop) { die("Propiedad no encontrada."); }
                     <li class="list-group-item"><strong>Agente Responsable:</strong> <?= $prop['nombre_completo'] ?></li>
                     <li class="list-group-item"><strong>Descripción:</strong><br> <?= nl2br($prop['descripcion']) ?></li>
                 </ul>
+                
+                <!-- Botones de acción -->
                 <a href="<?= ($_SESSION['rol'] == 'Agente') ? 'propiedades_agente.php' : 'propiedades.php' ?>" class="btn btn-secondary">Volver a la lista</a>
             </div>
         </div>
