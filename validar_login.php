@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: panel_agente.php"); // Panel de Agente
                 exit();
             } elseif ($_SESSION['rol'] == 'Cliente') {
-                header("Location: panel_cliente.php"); // Panel de Cliente (o index.php si aún no lo creas)
+                header("Location: index.php"); // Panel de Cliente (o index.php si aún no lo creas)
                 exit();
             } else {
                 $_SESSION['error'] = "Rol no reconocido.";
