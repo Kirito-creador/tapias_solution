@@ -56,26 +56,43 @@ $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
 <body>
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="panel_agente.php">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
                 <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
                 Tapia's Solution
             </a>
-            
-            <div class="navbar-nav ms-auto align-items-center">
-                
-                <!-- BOTÓN DE NOTIFICACIONES (Redirige a notificaciones.php) -->
-                <div class="nav-noti">
-                    <a href="notificaciones.php" class="btn-noti">
-                        <i class="bi bi-bell-fill"></i>
-                        <?php if ($total_notificaciones > 0): ?>
-                            <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
-                        <?php endif; ?>
-                    </a>
-                </div>
-                <!-- FIN BOTÓN NOTIFICACIONES -->
 
-                <span class="nav-link me-3">Hola, <?= $_SESSION['nombre'] ?></span>
-                <a class="nav-link" href="logout.php">Cerrar Sesión</a>
+            <!-- Botones de Navegación (Izquierda) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php"><i class="bi bi-house"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="panel_agente.php"><i class="bi bi-speedometer2"></i> Panel Agente</a>
+                    </li>
+                </ul>
+
+                <!-- Notificaciones y Sesión (Derecha) -->
+                <div class="navbar-nav align-items-center">
+                    
+                    <!-- BOTÓN DE NOTIFICACIONES (Redirige a notificaciones.php) -->
+                    <div class="nav-noti">
+                        <a href="notificaciones.php" class="btn-noti">
+                            <i class="bi bi-bell-fill"></i>
+                            <?php if ($total_notificaciones > 0): ?>
+                                <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                    <!-- FIN BOTÓN NOTIFICACIONES -->
+
+                    <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
+                    <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                </div>
             </div>
         </div>
     </nav>

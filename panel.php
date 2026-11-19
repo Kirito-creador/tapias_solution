@@ -8,9 +8,14 @@ if (!isset($_SESSION['rol'])) {
     exit();
 }
 
-// Solo permitir el acceso al panel de administrador a los que tienen ese rol
-if ($_SESSION['rol'] != 'Administrador') {
-    header("Location: panel_cliente.php"); // Redirigir a otro panel si no es admin
+// Redirigir al panel correspondiente si no es Administrador
+if ($_SESSION['rol'] == 'Agente') {
+    header("Location: panel_agente.php");
+    exit();
+} elseif ($_SESSION['rol'] == 'Cliente') {
+    // Por ahora, como aún no existe panel_cliente.php, lo mandamos al inicio
+    // Cuando tu compañero lo cree, puedes cambiarlo a header("Location: panel_cliente.php");
+    header("Location: index.php");
     exit();
 }
 
