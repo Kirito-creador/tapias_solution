@@ -19,6 +19,16 @@ if (!$prop) { die("Propiedad no encontrada."); }
 $sql_img = "SELECT url_imagen FROM imagen_propiedad WHERE id_propiedad = $id ORDER BY es_principal DESC, id_imagen ASC LIMIT 1";
 $res_img = mysqli_query($conexion, $sql_img);
 $img = mysqli_fetch_assoc($res_img);
+
+$ruta_imagen = null;
+if ($img && !empty($img['url_imagen'])) {
+    $ruta_imagen = $img['url_imagen'];
+    // Si la ruta no empieza con http ni con data:, la construimos con la carpeta del proyecto
+    if (strpos($ruta_imagen, 'http') !== 0 && strpos($ruta_imagen, 'data:') !== 0) {
+        // Ajusta si tu carpeta base es distinta a 'tapias_solution'
+        $ruta_imagen = "/tapias_solution/" . $ruta_imagen;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,23 +54,23 @@ $img = mysqli_fetch_assoc($res_img);
             <div class="card-body p-4">
                 <h4 class="text-dark mb-3"><?= $prop['tipo'] ?> en <?= $prop['tipo_operacion'] ?></h4>
                 
-                <?php if(isset($img['url_imagen']) && !empty($img['url_imagen'])): ?>
+                <?php if($ruta_imagen): ?>
                     <div class="text-center mb-4">
-                        <img src="<?= $img['url_imagen'] ?>" class="img-fluid rounded shadow-sm" alt="Foto de la propiedad" style="max-height: 350px; width: 100%; object-fit: cover;">
+                        <img src="<?= htmlspecialchars($ruta_imagen) ?>" class="img-fluid rounded shadow-sm" alt="Foto de la propiedad" style="max-height: 350px; width: 100%; object-fit: cover;">
                     </div>
                 <?php else: ?>
                     <div class="alert alert-secondary text-center mb-4">Esta propiedad no tiene imágenes subidas.</div>
                 <?php endif; ?>
                 
                 <ul class="list-group list-group-flush mb-4">
-                    <li class="list-group-item"><strong>Zona:</strong> <?= $prop['zona'] ?></li>
-                    <li class="list-group-item"><strong>Dirección:</strong> <?= $prop['direccion'] ?></li>
+                    <li class="list-group-item"><strong>Zona:</strong> <?= htmlspecialchars($prop['zona']) ?></li>
+                    <li class="list-group-item"><strong>Dirección:</strong> <?= htmlspecialchars($prop['direccion']) ?></li>
                     <li class="list-group-item"><strong>Precio:</strong> <?= $prop['precio'] ?> <?= $prop['moneda'] ?></li>
                     <li class="list-group-item"><strong>Superficie:</strong> <?= $prop['superficie_m2'] ?> m²</li>
                     <li class="list-group-item"><strong>Habitaciones:</strong> <?= $prop['habitaciones'] ?> | <strong>Baños:</strong> <?= $prop['banos'] ?></li>
                     <li class="list-group-item"><strong>Estado:</strong> <span class="badge bg-success"><?= $prop['estado'] ?></span></li>
-                    <li class="list-group-item"><strong>Agente Responsable:</strong> <?= $prop['nombre_completo'] ?></li>
-                    <li class="list-group-item"><strong>Descripción:</strong><br> <?= nl2br($prop['descripcion']) ?></li>
+                    <li class="list-group-item"><strong>Agente Responsable:</strong> <?= htmlspecialchars($prop['nombre_completo']) ?></li>
+                    <li class="list-group-item"><strong>Descripción:</strong><br> <?= nl2br(htmlspecialchars($prop['descripcion'])) ?></li>
                 </ul>
                 
                 <a href="<?= ($_SESSION['rol'] == 'Agente') ? 'propiedades_agente.php' : 'propiedades.php' ?>" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
