@@ -1,7 +1,5 @@
 <?php
 session_start();
-// No es necesario incluir conexión aquí si no vas a consultar la BD en el inicio, 
-// pero la dejamos por si luego quieres mostrar propiedades destacadas.
 include("conexion.php"); 
 ?>
 <!DOCTYPE html>
