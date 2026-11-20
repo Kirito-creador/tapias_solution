@@ -31,13 +31,9 @@ include("conexion.php");
             font-weight: 600; 
         }
 
-        /* Navbar */
         .navbar { background-color: var(--navbar-bg); }
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
 
-        /* ========================================== */
-        /* CARRUSEL DE FONDO (HERO) */
-        /* ========================================== */
         .hero-carousel {
             position: relative;
             height: 600px;
@@ -49,7 +45,6 @@ include("conexion.php");
             background-position: center;
             position: relative;
         }
-        /* Capa oscura semitransparente para que el texto se lea */
         .hero-carousel .carousel-item::before {
             content: "";
             position: absolute;
@@ -115,7 +110,6 @@ include("conexion.php");
         }
         .btn-hero-secondary:hover { background-color: white; color: var(--text-color); }
 
-        /* Servicios */
         .section-title { text-align: center; margin-bottom: 40px; margin-top: 60px;}
         .section-title span { color: var(--btn-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: block; margin-bottom: 10px; }
         
@@ -146,7 +140,6 @@ include("conexion.php");
         .service-card h4 { font-size: 1.3rem; margin-bottom: 15px; }
         .service-card p { color: #666; font-size: 0.95rem; }
 
-        /* Trayectoria */
         .stats-section {
             background-color: #2b1e16;
             color: white;
@@ -160,7 +153,6 @@ include("conexion.php");
         .stat-item h3 { font-size: 3rem; color: var(--btn-color); margin-bottom: 5px; }
         .stat-item p { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #ccc; margin: 0; }
 
-        /* CTA Final */
         .cta-section {
             background-color: var(--olive-bg);
             color: white;
@@ -188,7 +180,6 @@ include("conexion.php");
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="index.php">
@@ -207,9 +198,6 @@ include("conexion.php");
         </div>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- CARRUSEL DE FONDO (HERO) -->
-    <!-- ========================================== -->
     <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
@@ -218,8 +206,7 @@ include("conexion.php");
         </div>
 
         <div class="carousel-inner">
-            <!-- Diapositiva 1: Cambia 'fondo1.jpg' por tu imagen -->
-            <div class="carousel-item active" style="background-image: url('fondo1.jpg');">
+            <div class="carousel-item active" style="background-image: url('fondo1.jpeg');">
                 <div class="carousel-caption">
                     <div class="hero-badge">Bienvenido a Tapia's Solution</div>
                     <h1 class="hero-title">Encuentra tu hogar ideal en<br>Cochabamba</h1>
@@ -231,8 +218,7 @@ include("conexion.php");
                 </div>
             </div>
             
-            <!-- Diapositiva 2: Cambia 'fondo2.jpg' por tu imagen -->
-            <div class="carousel-item" style="background-image: url('fondo2.jpg');">
+            <div class="carousel-item" style="background-image: url('fondo2.jpeg');">
                 <div class="carousel-caption">
                     <div class="hero-badge">Inversión Inteligente</div>
                     <h1 class="hero-title">Los mejores terrenos y casas</h1>
@@ -244,8 +230,7 @@ include("conexion.php");
                 </div>
             </div>
 
-            <!-- Diapositiva 3: Cambia 'fondo3.jpg' por tu imagen -->
-            <div class="carousel-item" style="background-image: url('fondo3.jpg');">
+            <div class="carousel-item" style="background-image: url('fondo3.jpeg');">
                 <div class="carousel-caption">
                     <div class="hero-badge">Asesoría Personalizada</div>
                     <h1 class="hero-title">Te acompañamos en cada paso</h1>
@@ -268,7 +253,6 @@ include("conexion.php");
         </button>
     </div>
 
-    <!-- Sección de Servicios -->
     <section class="container mb-5">
         <div class="section-title">
             <span>Servicios</span>
@@ -301,7 +285,6 @@ include("conexion.php");
         </div>
     </section>
 
-    <!-- Sección de Trayectoria -->
     <section class="stats-section">
         <div class="container">
             <h2>Nuestra Trayectoria</h2>
@@ -336,7 +319,6 @@ include("conexion.php");
         </div>
     </section>
 
-    <!-- Sección CTA Final -->
     <section class="cta-section">
         <div class="container">
             <h2>¿Listo para encontrar tu próximo hogar?</h2>
@@ -347,7 +329,6 @@ include("conexion.php");
         </div>
     </section>
 
-    <!-- Footer -->
     <?php include("footer.php"); ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
