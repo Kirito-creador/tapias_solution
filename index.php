@@ -34,17 +34,40 @@ include("conexion.php");
         /* Navbar */
         .navbar { background-color: var(--navbar-bg); }
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
-        
-        /* Hero Section */
-        .hero-section {
-            /* Aquí cambiaremos el color por la imagen de fondo después */
-            background-color: #5a4a42; /* Color temporal */
-            color: white;
-            padding: 120px 0;
-            text-align: center;
+
+        /* ========================================== */
+        /* CARRUSEL DE FONDO (HERO) */
+        /* ========================================== */
+        .hero-carousel {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+        .hero-carousel .carousel-item {
+            height: 600px;
+            background-size: cover;
+            background-position: center;
             position: relative;
         }
-        
+        /* Capa oscura semitransparente para que el texto se lea */
+        .hero-carousel .carousel-item::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(62, 42, 30, 0.6);
+            z-index: 1;
+        }
+        .carousel-caption {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            bottom: auto;
+        }
         .hero-badge {
             background-color: rgba(255, 255, 255, 0.2);
             color: #F2EBDD;
@@ -55,21 +78,19 @@ include("conexion.php");
             letter-spacing: 1px;
             margin-bottom: 20px;
             display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
         }
-
         .hero-title {
             font-size: 3.5rem;
             margin-bottom: 20px;
             line-height: 1.2;
+            color: white;
         }
-
         .hero-subtitle {
             font-size: 1.1rem;
-            max-width: 600px;
             margin: 0 auto 40px auto;
             color: #f0e6df;
         }
-
         .btn-hero-primary {
             background-color: var(--btn-color);
             color: white;
@@ -81,7 +102,6 @@ include("conexion.php");
             transition: 0.3s;
         }
         .btn-hero-primary:hover { background-color: #a34225; color: white; }
-
         .btn-hero-secondary {
             background-color: transparent;
             color: white;
@@ -96,7 +116,7 @@ include("conexion.php");
         .btn-hero-secondary:hover { background-color: white; color: var(--text-color); }
 
         /* Servicios */
-        .section-title { text-align: center; margin-bottom: 40px; }
+        .section-title { text-align: center; margin-bottom: 40px; margin-top: 60px;}
         .section-title span { color: var(--btn-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: block; margin-bottom: 10px; }
         
         .service-card {
@@ -128,7 +148,7 @@ include("conexion.php");
 
         /* Trayectoria */
         .stats-section {
-            background-color: #2b1e16; /* Marrón muy oscuro */
+            background-color: #2b1e16;
             color: white;
             padding: 80px 0;
             text-align: center;
@@ -168,7 +188,7 @@ include("conexion.php");
 </head>
 <body>
 
-    <!-- Navbar (Idéntico a tus otras páginas) -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="index.php">
@@ -177,35 +197,79 @@ include("conexion.php");
             </a>
             <div class="navbar-nav ms-auto align-items-center">
                 <?php if (isset($_SESSION['rol'])): ?>
-                    <!-- Si ya inició sesión, mostrar enlace al panel -->
                     <a class="nav-link me-3" href="panel.php"><i class="bi bi-speedometer2"></i> Ir al Panel</a>
                     <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
                     <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
                 <?php else: ?>
-                    <!-- Si no ha iniciado sesión, mostrar botón de ingreso -->
                     <a class="nav-link me-3" href="login.php"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión</a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-badge">Bienvenido a Tapia's Solution</div>
-            <h1 class="hero-title">Encuentra tu hogar ideal en<br>Cochabamba</h1>
-            <p class="hero-subtitle">Casas, departamentos y terrenos con la mejor ubicación y asesoría personalizada.</p>
+    <!-- ========================================== -->
+    <!-- CARRUSEL DE FONDO (HERO) -->
+    <!-- ========================================== -->
+    <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+
+        <div class="carousel-inner">
+            <!-- Diapositiva 1: Cambia 'fondo1.jpg' por tu imagen -->
+            <div class="carousel-item active" style="background-image: url('fondo1.jpg');">
+                <div class="carousel-caption">
+                    <div class="hero-badge">Bienvenido a Tapia's Solution</div>
+                    <h1 class="hero-title">Encuentra tu hogar ideal en<br>Cochabamba</h1>
+                    <p class="hero-subtitle">Casas, departamentos y terrenos con la mejor ubicación y asesoría personalizada.</p>
+                    <div>
+                        <a href="propiedades_publicas.php" class="btn-hero-primary"><i class="bi bi-house"></i> Ver Propiedades</a>
+                        <a href="registro.php" class="btn-hero-secondary"><i class="bi bi-person-plus"></i> Registrarse</a>
+                    </div>
+                </div>
+            </div>
             
-            <!-- BOTONES DE REDIRECCIÓN -->
-            <div>
-                <a href="propiedades_publicas.php" class="btn-hero-primary"><i class="bi bi-house"></i> Ver Propiedades</a>
-                <a href="registro.php" class="btn-hero-secondary"><i class="bi bi-person-plus"></i> Registrarse</a>
+            <!-- Diapositiva 2: Cambia 'fondo2.jpg' por tu imagen -->
+            <div class="carousel-item" style="background-image: url('fondo2.jpg');">
+                <div class="carousel-caption">
+                    <div class="hero-badge">Inversión Inteligente</div>
+                    <h1 class="hero-title">Los mejores terrenos y casas</h1>
+                    <p class="hero-subtitle">Invierte en tu futuro con las propiedades más exclusivas de la ciudad.</p>
+                    <div>
+                        <a href="propiedades_publicas.php" class="btn-hero-primary"><i class="bi bi-house"></i> Ver Propiedades</a>
+                        <a href="registro.php" class="btn-hero-secondary"><i class="bi bi-person-plus"></i> Registrarse</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diapositiva 3: Cambia 'fondo3.jpg' por tu imagen -->
+            <div class="carousel-item" style="background-image: url('fondo3.jpg');">
+                <div class="carousel-caption">
+                    <div class="hero-badge">Asesoría Personalizada</div>
+                    <h1 class="hero-title">Te acompañamos en cada paso</h1>
+                    <p class="hero-subtitle">Nuestro equipo de expertos te guiará en todo el proceso legal y financiero.</p>
+                    <div>
+                        <a href="propiedades_publicas.php" class="btn-hero-primary"><i class="bi bi-house"></i> Ver Propiedades</a>
+                        <a href="registro.php" class="btn-hero-secondary"><i class="bi bi-person-plus"></i> Registrarse</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
 
     <!-- Sección de Servicios -->
-    <section class="container mt-5 mb-5">
+    <section class="container mb-5">
         <div class="section-title">
             <span>Servicios</span>
             <h2>Nuestros Servicios</h2>
@@ -213,7 +277,6 @@ include("conexion.php");
         </div>
 
         <div class="row g-4">
-            <!-- Servicio 1 -->
             <div class="col-md-4">
                 <div class="service-card">
                     <div class="service-icon"><i class="bi bi-house-door"></i></div>
@@ -221,7 +284,6 @@ include("conexion.php");
                     <p>Encuentra la propiedad perfecta para ti y tu familia con las mejores opciones del mercado.</p>
                 </div>
             </div>
-            <!-- Servicio 2 -->
             <div class="col-md-4">
                 <div class="service-card">
                     <div class="service-icon"><i class="bi bi-key"></i></div>
@@ -229,7 +291,6 @@ include("conexion.php");
                     <p>Opciones flexibles de alquiler y anticrético para que puedas mudarte sin complicaciones.</p>
                 </div>
             </div>
-            <!-- Servicio 3 -->
             <div class="col-md-4">
                 <div class="service-card">
                     <div class="service-icon"><i class="bi bi-clipboard-check"></i></div>
@@ -240,7 +301,7 @@ include("conexion.php");
         </div>
     </section>
 
-    <!-- Sección de Trayectoria (Estadísticas) -->
+    <!-- Sección de Trayectoria -->
     <section class="stats-section">
         <div class="container">
             <h2>Nuestra Trayectoria</h2>
@@ -280,7 +341,6 @@ include("conexion.php");
         <div class="container">
             <h2>¿Listo para encontrar tu próximo hogar?</h2>
             <p>Contáctanos y uno de nuestros agentes te atenderá personalmente.</p>
-            <!-- Botón que puede ir a WhatsApp o a contacto -->
             <a href="https://wa.me/59169172830" target="_blank" class="btn-cta">
                 <i class="bi bi-whatsapp"></i> Comenzar Ahora
             </a>
