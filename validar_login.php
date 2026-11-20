@@ -1,5 +1,5 @@
 <?php
-session_start();   //iniciz o reanuda una sesion que permite guardar datos del usuario entre distintas paginas
+session_start();
 include("conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -21,7 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['nombre'] = $usuario['nombre_completo'];
             $_SESSION['rol'] = $usuario['nombre_rol'];
 
-            header("Location: panel.php");
+            if ($usuario['nombre_rol'] == 'Cliente') {
+                header("Location: panel_cliente.php");
+            } elseif ($usuario['nombre_rol'] == 'Agente') {
+                header("Location: panel_agente.php");
+            } else {
+                header("Location: panel.php");
+            }
             exit();
         } else {
             $_SESSION['error'] = "Contraseña incorrecta.";
