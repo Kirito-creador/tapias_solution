@@ -10,6 +10,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Cliente') {
 $id_usuario = $_SESSION['id_usuario'];
 $nombre_usuario = $_SESSION['nombre'];
 
+// --- Lógica para buscar/crear el cliente ---
 $sql_cliente = "SELECT id_cliente FROM cliente WHERE id_usuario = $id_usuario";
 $res_cliente = mysqli_query($conexion, $sql_cliente);
 $cliente = mysqli_fetch_assoc($res_cliente);
@@ -29,6 +30,7 @@ if (!$cliente) {
     $id_cliente = $cliente['id_cliente'];
 }
 
+// --- Estadísticas ---
 $sql_stats = "SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN id_estado_cita = 1 THEN 1 ELSE 0 END) as pendientes,
@@ -37,6 +39,7 @@ $sql_stats = "SELECT
 $res_stats = mysqli_query($conexion, $sql_stats);
 $stats = mysqli_fetch_assoc($res_stats);
 
+// --- Últimas 3 visitas ---
 $sql_citas = "SELECT c.fecha_cita, c.hora_inicio, p.tipo, p.zona, ec.nombre_estado AS estado_actual
               FROM cita c 
               INNER JOIN propiedad p ON c.id_propiedad = p.id_propiedad 
@@ -45,6 +48,7 @@ $sql_citas = "SELECT c.fecha_cita, c.hora_inicio, p.tipo, p.zona, ec.nombre_esta
               ORDER BY c.fecha_cita DESC LIMIT 3";
 $res_citas = mysqli_query($conexion, $sql_citas);
 
+// --- Notificaciones ---
 $sql_noti = "SELECT COUNT(*) as total FROM notificacion WHERE id_usuario = $id_usuario AND leida = FALSE";
 $res_noti = mysqli_query($conexion, $sql_noti);
 $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
@@ -63,13 +67,13 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
 
-        .card-stat { background: white; border: none; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
-        .card-stat h5 { color: #6B6B43; font-weight: 600; font-size: 0.9rem; margin-bottom: 10px; }
+        .card-stat { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .card-stat h5 { color: #6B6B43; font-weight: 600; font-size: 0.95rem; margin-bottom: 10px; }
         .card-stat h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0; }
         .text-verde { color: #1e6b42; }
         .text-rojo { color: #C1512F; }
         
-        .table-custom { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .table-custom { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #ddd; }
         .table-custom thead { background-color: #3E2A1E; color: white; }
         .table-custom thead th { padding: 15px; font-weight: 600; border: none; }
         .table-custom tbody td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #eee; }
@@ -78,15 +82,32 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
         .bg-pendiente { background-color: #6B6B43; }
         .bg-confirmada { background-color: #C1512F; }
         .bg-completada { background-color: #3E2A1E; }
-        .bg-cancelada { background-color: #555555; }
 
-        .btn-noti { position: relative; color: #F2EBDD; font-size: 1.3rem; text-decoration: none; margin-right: 20px; }
-        .badge-noti-burbuja { position: absolute; top: -5px; right: -10px; background-color: #C1512F; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; border: 2px solid #3E2A1E; }
-        
-        .btn-catalogo { background-color: #C1512F; color: white; font-weight: 600; padding: 8px 20px; border-radius: 5px; text-decoration: none; }
-        .btn-catalogo:hover { background-color: #a34225; color: white; }
-        .btn-ver-todas { background-color: transparent; border: 1px solid #C1512F; color: #C1512F; font-weight: 600; padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.85rem; }
-        .btn-ver-todas:hover { background-color: #C1512F; color: white; }
+        /* Estilo de los botones superiores */
+        .btn-superior { 
+            background-color: transparent; 
+            border: 1px solid #C1512F; 
+            color: #C1512F; 
+            font-weight: 600; 
+            padding: 5px 15px; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-superior:hover { background-color: #C1512F; color: white; }
+
+        .badge-noti-burbuja { 
+            background-color: #6B6B43; 
+            color: white; 
+            border-radius: 50%; 
+            padding: 2px 6px; 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -98,16 +119,8 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
                 Tapia's Solution
             </a>
             <div class="navbar-nav ms-auto align-items-center">
-                <a class="nav-link me-3" href="#"><i class="bi bi-house"></i> Inicio</a>
-                <a class="nav-link me-3" href="#"><i class="bi bi-grid"></i> Mi Panel</a>
-                
-                <a href="notificaciones_cliente.php" class="btn-noti">
-                    <i class="bi bi-bell-fill"></i>
-                    <?php if ($total_notificaciones > 0): ?>
-                        <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
-                    <?php endif; ?>
-                </a>
-                
+                <a class="nav-link me-3" href="index.php"><i class="bi bi-house"></i> Inicio</a>
+                <a class="nav-link me-3" href="panel_cliente.php"><i class="bi bi-grid"></i> Mi Panel</a>
                 <span class="nav-link me-3">Hola, <strong><?= htmlspecialchars($nombre_usuario) ?></strong></span>
                 <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
             </div>
@@ -117,8 +130,20 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
     <div class="container mb-5">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h1 class="mb-0">Mi Panel</h1>
-            <a href="propiedades_publicas.php" class="btn-catalogo"><i class="bi bi-book"></i> Ver Catálogo</a>
+            
+            <div class="d-flex gap-2">
+                <a href="notificaciones_cliente.php" class="btn-superior">
+                    <i class="bi bi-bell"></i> Notificaciones 
+                    <?php if ($total_notificaciones > 0): ?>
+                        <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
+                    <?php endif; ?>
+                </a>
+                <a href="propiedades_publicas.php" class="btn-superior">
+                    <i class="bi bi-book"></i> Ver Catálogo
+                </a>
+            </div>
         </div>
+        
         <p class="text-muted mb-4">Bienvenido, <?= htmlspecialchars($nombre_usuario) ?>. Aquí puedes gestionar tus visitas agendadas.</p>
 
         <div class="row mb-5">
@@ -144,7 +169,7 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">Tus últimas visitas</h3>
-            <a href="mis_citas_cliente.php" class="btn-ver-todas">Ver todas</a>
+            <a href="mis_citas_cliente.php" class="btn-superior">Ver todas</a>
         </div>
 
         <div class="table-responsive table-custom">
@@ -170,7 +195,6 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
                                         $clase = 'bg-pendiente';
                                         if ($estado == 'confirmada') $clase = 'bg-confirmada';
                                         elseif ($estado == 'completada') $clase = 'bg-completada';
-                                        elseif ($estado == 'cancelada') $clase = 'bg-cancelada';
                                     ?>
                                     <span class="badge-estado <?= $clase ?>"><?= htmlspecialchars($c['estado_actual']) ?></span>
                                 </td>
