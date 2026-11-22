@@ -1,6 +1,15 @@
 <?php
 session_start();
 include("conexion.php"); 
+
+$link_panel = 'panel.php';
+if (isset($_SESSION['rol'])) {
+    if ($_SESSION['rol'] == 'Cliente') {
+        $link_panel = 'panel_cliente.php';
+    } elseif ($_SESSION['rol'] == 'Agente') {
+        $link_panel = 'panel_agente.php';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -188,7 +197,7 @@ include("conexion.php");
             </a>
             <div class="navbar-nav ms-auto align-items-center">
                 <?php if (isset($_SESSION['rol'])): ?>
-                    <a class="nav-link me-3" href="panel.php"><i class="bi bi-speedometer2"></i> Ir al Panel</a>
+                    <a class="nav-link me-3" href="<?= $link_panel ?>"><i class="bi bi-speedometer2"></i> Ir al Panel</a>
                     <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
                     <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
                 <?php else: ?>
