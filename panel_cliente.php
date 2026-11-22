@@ -8,15 +8,26 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Cliente') {
 }
 
 $id_usuario = $_SESSION['id_usuario'];
+$nombre_usuario = $_SESSION['nombre'];
 
 $sql_cliente = "SELECT id_cliente FROM cliente WHERE id_usuario = $id_usuario";
 $res_cliente = mysqli_query($conexion, $sql_cliente);
 $cliente = mysqli_fetch_assoc($res_cliente);
 
 if (!$cliente) {
-    die("No tienes un perfil de cliente asociado.");
+    $sql_usr = "SELECT email, telefono FROM usuario WHERE id_usuario = $id_usuario";
+    $res_usr = mysqli_query($conexion, $sql_usr);
+    $datos_usr = mysqli_fetch_assoc($res_usr);
+    $email = $datos_usr['email'];
+    $telefono = $datos_usr['telefono'] ?? '00000000';
+    
+    $sql_insert = "INSERT INTO cliente (nombre_completo, email, telefono, id_usuario, id_estado_prospecto) 
+                   VALUES ('$nombre_usuario', '$email', '$telefono', $id_usuario, 1)";
+    mysqli_query($conexion, $sql_insert);
+    $id_cliente = mysqli_insert_id($conexion);
+} else {
+    $id_cliente = $cliente['id_cliente'];
 }
-$id_cliente = $cliente['id_cliente'];
 
 $sql_stats = "SELECT 
     COUNT(*) as total,
@@ -44,7 +55,7 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
     <meta charset="UTF-8">
     <title>Mi Panel - Tapia's Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #F2EBDD; font-family: 'Nunito Sans', sans-serif; color: #3E2A1E; }
@@ -54,7 +65,9 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
 
         .card-stat { background: white; border: none; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
         .card-stat h5 { color: #6B6B43; font-weight: 600; font-size: 0.9rem; margin-bottom: 10px; }
-        .card-stat h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0; color: #C1512F; }
+        .card-stat h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0; }
+        .text-verde { color: #1e6b42; }
+        .text-rojo { color: #C1512F; }
         
         .table-custom { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .table-custom thead { background-color: #3E2A1E; color: white; }
@@ -65,9 +78,15 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
         .bg-pendiente { background-color: #6B6B43; }
         .bg-confirmada { background-color: #C1512F; }
         .bg-completada { background-color: #3E2A1E; }
+        .bg-cancelada { background-color: #555555; }
 
-        .btn-noti { position: relative; color: #F2EBDD; font-size: 1.2rem; text-decoration: none; margin-right: 15px; }
-        .badge-noti-burbuja { position: absolute; top: -5px; right: -10px; background-color: #C1512F; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; }
+        .btn-noti { position: relative; color: #F2EBDD; font-size: 1.3rem; text-decoration: none; margin-right: 20px; }
+        .badge-noti-burbuja { position: absolute; top: -5px; right: -10px; background-color: #C1512F; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; border: 2px solid #3E2A1E; }
+        
+        .btn-catalogo { background-color: #C1512F; color: white; font-weight: 600; padding: 8px 20px; border-radius: 5px; text-decoration: none; }
+        .btn-catalogo:hover { background-color: #a34225; color: white; }
+        .btn-ver-todas { background-color: transparent; border: 1px solid #C1512F; color: #C1512F; font-weight: 600; padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.85rem; }
+        .btn-ver-todas:hover { background-color: #C1512F; color: white; }
     </style>
 </head>
 <body>
@@ -79,49 +98,53 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
                 Tapia's Solution
             </a>
             <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link me-3" href="#"><i class="bi bi-house"></i> Inicio</a>
+                <a class="nav-link me-3" href="#"><i class="bi bi-grid"></i> Mi Panel</a>
+                
                 <a href="notificaciones_cliente.php" class="btn-noti">
                     <i class="bi bi-bell-fill"></i>
                     <?php if ($total_notificaciones > 0): ?>
                         <span class="badge-noti-burbuja"><?= $total_notificaciones ?></span>
                     <?php endif; ?>
                 </a>
-                <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
+                
+                <span class="nav-link me-3">Hola, <strong><?= htmlspecialchars($nombre_usuario) ?></strong></span>
                 <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container mb-5">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h1 class="mb-0">Mi Panel</h1>
-            <a href="propiedades_publicas.php" class="btn" style="background-color: #C1512F; color: white; font-weight: 600;"><i class="bi bi-book"></i> Ver Catálogo</a>
+            <a href="propiedades_publicas.php" class="btn-catalogo"><i class="bi bi-book"></i> Ver Catálogo</a>
         </div>
-        <p class="text-muted mb-4">Bienvenido, <strong><?= $_SESSION['nombre'] ?></strong>. Aquí puedes gestionar tus visitas agendadas.</p>
+        <p class="text-muted mb-4">Bienvenido, <?= htmlspecialchars($nombre_usuario) ?>. Aquí puedes gestionar tus visitas agendadas.</p>
 
         <div class="row mb-5">
             <div class="col-md-4 mb-3">
                 <div class="card-stat">
                     <h5>Visitas agendadas</h5>
-                    <h2><?= $stats['total'] ?? 0 ?></h2>
+                    <h2 class="text-rojo"><?= $stats['total'] ?? 0 ?></h2>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
                 <div class="card-stat">
                     <h5>Pendientes</h5>
-                    <h2 style="color: #6B6B43;"><?= $stats['pendientes'] ?? 0 ?></h2>
+                    <h2 class="text-verde"><?= $stats['pendientes'] ?? 0 ?></h2>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
                 <div class="card-stat">
                     <h5>Confirmadas</h5>
-                    <h2><?= $stats['confirmadas'] ?? 0 ?></h2>
+                    <h2 class="text-rojo"><?= $stats['confirmadas'] ?? 0 ?></h2>
                 </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">Tus últimas visitas</h3>
-            <a href="mis_citas_cliente.php" class="btn btn-sm btn-outline-dark">Ver todas</a>
+            <a href="mis_citas_cliente.php" class="btn-ver-todas">Ver todas</a>
         </div>
 
         <div class="table-responsive table-custom">
@@ -140,20 +163,21 @@ $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];
                             <tr>
                                 <td><?= date('d/m/Y', strtotime($c['fecha_cita'])) ?></td>
                                 <td><?= date('H:i', strtotime($c['hora_inicio'])) ?></td>
-                                <td><?= $c['tipo'] ?> en <?= $c['zona'] ?></td>
+                                <td><?= htmlspecialchars($c['tipo']) ?> en <?= htmlspecialchars($c['zona']) ?></td>
                                 <td>
                                     <?php
                                         $estado = strtolower($c['estado_actual']);
                                         $clase = 'bg-pendiente';
                                         if ($estado == 'confirmada') $clase = 'bg-confirmada';
                                         elseif ($estado == 'completada') $clase = 'bg-completada';
+                                        elseif ($estado == 'cancelada') $clase = 'bg-cancelada';
                                     ?>
-                                    <span class="badge-estado <?= $clase ?>"><?= $c['estado_actual'] ?></span>
+                                    <span class="badge-estado <?= $clase ?>"><?= htmlspecialchars($c['estado_actual']) ?></span>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <tr><td colspan="4" class="text-center">No tienes visitas recientes.</td></tr>
+                        <tr><td colspan="4" class="text-center py-4">No tienes visitas recientes.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
