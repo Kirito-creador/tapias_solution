@@ -142,8 +142,7 @@ if (count($imagenes) > 0) {
                     </div>
 
                     <!-- Botón para reservar visita, redirige al formulario de citas -->
-                    <a href="agendar_cita_cliente.php?id_propiedad=<?= $prop['id_propiedad'] ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>
-                </div>
+<a href="reservar_visita.php?id=<?= $prop['id_propiedad'] ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>                </div>
             </div>
         </div>
     </div>
