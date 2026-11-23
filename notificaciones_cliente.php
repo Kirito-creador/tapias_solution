@@ -73,7 +73,7 @@ $resultado = mysqli_query($conexion, $sql);
                             <p class="noti-mensaje"><?= htmlspecialchars($noti['mensaje']) ?></p>
                         </div>
                         <?php if (!$noti['leida']): ?>
-                            <a href="marcar_notificacion_cliente.php?id=<?= $noti['id_notificacion'] ?>" class="btn-marcar-leida">Marcar leída</a>
+                            <a href="marcar_notificaciones_cliente.php?id=<?= $noti['id_notificacion'] ?>" class="btn-marcar-leida">Marcar leída</a>
                         <?php endif; ?>
                     </div>
                 </div>
