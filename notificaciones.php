@@ -153,9 +153,8 @@ $resultado = mysqli_query($conexion, $sql);
                             <p class="noti-mensaje"><?= htmlspecialchars($noti['mensaje']) ?></p>
                         </div>
                         <?php if (!$noti['leida']): ?>
-                            <!-- Enlace para marcar una notificación individual como leída -->
-                            <a href="marcar_notificacion_leida.php?id=<?= $noti['id_notificacion'] ?>" class="btn-marcar-leida">Marcar leída</a>
-                        <?php endif; ?>
+                            <a href="marcar_notificaciones.php?id=<?= $noti['id_notificacion'] ?>" class="btn-marcar-leida">Marcar leída</a>
+                            <?php endif; ?>
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -165,7 +164,6 @@ $resultado = mysqli_query($conexion, $sql);
             </div>
         <?php endif; ?>
 
-        <!-- Botón para marcar todas como leídas -->
         <div class="text-center">
             <a href="marcar_notificaciones.php" class="btn-marcar-todas">Marcar todas como leídas</a>
         </div>
