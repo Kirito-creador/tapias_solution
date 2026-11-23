@@ -2,12 +2,7 @@
 session_start();
 include("conexion.php");
 
-if (!isset($_SESSION['rol']) || ($_SESSION['rol'] != 'Administrador' && $_SESSION['rol'] != 'Agente')) {
-    header("Location: login.php");
-    exit();
-}
-
-if (!isset($_GET['id'])) { header("Location: panel.php"); exit(); }
+if (!isset($_GET['id'])) { header("Location: propiedades_publicas.php"); exit(); }
 $id = intval($_GET['id']);
 
 $sql = "SELECT p.*, u.nombre_completo FROM propiedad p 
@@ -18,16 +13,18 @@ $prop = mysqli_fetch_assoc($res);
 
 if (!$prop) { die("Propiedad no encontrada."); }
 
-// Buscar imagen
-$sql_img = "SELECT url_imagen FROM imagen_propiedad WHERE id_propiedad = $id ORDER BY es_principal DESC, id_imagen ASC LIMIT 1";
+$sql_img = "SELECT url_imagen FROM imagen_propiedad WHERE id_propiedad = $id ORDER BY es_principal DESC, id_imagen ASC";
 $res_img = mysqli_query($conexion, $sql_img);
-$img = mysqli_fetch_assoc($res_img);
+$imagenes = [];
+while ($img = mysqli_fetch_assoc($res_img)) {
+    $imagenes[] = $img;
+}
 
-$ruta_imagen = null;
-if ($img && !empty($img['url_imagen'])) {
-    $ruta_imagen = $img['url_imagen'];
-    if (strpos($ruta_imagen, 'http') !== 0 && strpos($ruta_imagen, 'data:') !== 0) {
-        $ruta_imagen = "/tapias_solution/" . $ruta_imagen;
+$imagen_principal = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+if (count($imagenes) > 0) {
+    $imagen_principal = $imagenes[0]['url_imagen'];
+    if (strpos($imagen_principal, 'http') !== 0 && strpos($imagen_principal, 'data:') !== 0) {
+        $imagen_principal = "/tapias_solution/" . $imagen_principal;
     }
 }
 ?>
@@ -56,26 +53,6 @@ if ($img && !empty($img['url_imagen'])) {
         }
         .main-image { width: 100%; height: 400px; object-fit: cover; border-radius: 8px; }
         
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .nav-arrow:hover { background-color: rgba(0,0,0,0.8); }
-        .nav-arrow.left { left: 20px; }
-        .nav-arrow.right { right: 20px; }
-
         .card-details { 
             background-color: white; 
             border-radius: 10px; 
@@ -85,7 +62,7 @@ if ($img && !empty($img['url_imagen'])) {
         }
         .badge-estado { background-color: #6B6B43; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
         .title-prop { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 2rem; margin: 0; }
-        .price-prop { font-size: 1.5rem; font-weight: 700; color: #3E2A1E; margin: 10px 0; }
+        .price-prop { font-size: 1.5rem; font-weight: 700; color: #C1512F; margin: 10px 0; }
         .location-prop { font-size: 0.9rem; color: #777; margin-bottom: 20px; }
         .badge-operacion { background-color: #3E2A1E; color: white; font-size: 0.75rem; padding: 4px 12px; border-radius: 4px; display: inline-block; margin-bottom: 20px; }
 
@@ -96,7 +73,7 @@ if ($img && !empty($img['url_imagen'])) {
 
         .desc-box { font-size: 0.9rem; color: #666; line-height: 1.6; margin-top: 15px; }
 
-        .btn-reservar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 5px; width: 100%; margin-top: 20px; transition: 0.3s; }
+        .btn-reservar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 5px; width: 100%; margin-top: 20px; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
         .btn-reservar:hover { background-color: #a34225; color: white; }
     </style>
 </head>
@@ -104,56 +81,55 @@ if ($img && !empty($img['url_imagen'])) {
 
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="panel.php">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
                 <i class="bi bi-house-door-fill" style="font-size: 1.5rem; color: #8FBC8F; margin-right: 10px;"></i>
                 Tapia's Solution
             </a>
             <div class="navbar-nav ms-auto align-items-center">
-                <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
-                <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                <?php if (isset($_SESSION['rol'])): ?>
+                    <a class="nav-link me-3" href="<?= ($_SESSION['rol'] == 'Cliente') ? 'panel_cliente.php' : (($_SESSION['rol'] == 'Agente') ? 'panel_agente.php' : 'panel.php') ?>"><i class="bi bi-grid"></i> Mi Panel</a>
+                    <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
+                    <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                <?php else: ?>
+                    <a class="nav-link me-3" href="login.php"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
 
     <div class="container mb-5">
-        <!-- Breadcrumbs -->
         <div class="breadcrumb-custom">
-            <a href="panel.php">Inicio</a> / <a href="<?= ($_SESSION['rol'] == 'Agente') ? 'propiedades_agente.php' : 'propiedades.php' ?>">Catálogo</a> / <?= $prop['tipo'] ?> en <?= $prop['zona'] ?>
+            <a href="index.php">Inicio</a> / <a href="propiedades_publicas.php">Catálogo</a> / <?= htmlspecialchars($prop['tipo']) ?> en <?= htmlspecialchars($prop['zona']) ?>
         </div>
 
         <div class="row">
-            <!-- Columna Izquierda: Imagen y Flechas -->
             <div class="col-md-7 mb-4">
                 <div class="card-img-container">
-                    <?php if($ruta_imagen): ?>
-                        <img src="<?= htmlspecialchars($ruta_imagen) ?>" alt="Foto de la propiedad" class="main-image" id="imagenPrincipal">
-                        <!-- Flechas de navegación (solo decorativas si hay una sola imagen) -->
-                        <button class="nav-arrow left"><i class="bi bi-chevron-left"></i></button>
-                        <button class="nav-arrow right"><i class="bi bi-chevron-right"></i></button>
+                    <?php if($imagen_principal): ?>
+                        <img src="<?= htmlspecialchars($imagen_principal) ?>" alt="Foto de la propiedad" class="main-image" id="imagenPrincipal">
                     <?php else: ?>
                         <div class="alert alert-secondary text-center">Esta propiedad no tiene imágenes subidas.</div>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <!-- Columna Derecha: Detalles -->
             <div class="col-md-5">
                 <div class="card-details">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h1 class="title-prop"><?= $prop['tipo'] ?></h1>
-                        <span class="badge-estado"><?= $prop['estado'] ?></span>
+                        <h1 class="title-prop"><?= htmlspecialchars($prop['tipo']) ?></h1>
+                        <span class="badge-estado"><?= htmlspecialchars($prop['estado']) ?></span>
                     </div>
                     
-                    <div class="location-prop"><i class="bi bi-geo-alt"></i> <?= $prop['zona'] ?> — <?= $prop['direccion'] ?></div>
-                    <div class="price-prop"><?= $prop['moneda'] ?> <?= number_format($prop['precio'], 2, '.', ',') ?></div>
+                    <div class="location-prop"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($prop['zona']) ?> — <?= htmlspecialchars($prop['direccion']) ?></div>
+                    <div class="price-prop"><?= htmlspecialchars($prop['moneda']) ?> <?= number_format($prop['precio'], 2, '.', ',') ?></div>
                     
-                    <div class="badge-operacion"><?= $prop['tipo_operacion'] ?></div>
+                    <div class="badge-operacion"><?= htmlspecialchars($prop['tipo_operacion']) ?></div>
 
                     <ul class="list-group detail-list mb-3">
-                        <li class="list-group-item"><span><i class="bi bi-bounding-box"></i> Superficie</span> <strong><?= $prop['superficie_m2'] ?> m²</strong></li>
-                        <li class="list-group-item"><span><i class="bi bi-door-open"></i> Habitaciones</span> <strong><?= $prop['habitaciones'] ?></strong></li>
-                        <li class="list-group-item"><span><i class="bi bi-droplet"></i> Baños</span> <strong><?= $prop['banos'] ?></strong></li>
-                        <li class="list-group-item"><span><i class="bi bi-person-badge"></i> Agente responsable</span> <strong><?= $prop['nombre_completo'] ?></strong></li>
+                        <li class="list-group-item"><span><i class="bi bi-bounding-box"></i> Superficie</span> <strong><?= htmlspecialchars($prop['superficie_m2']) ?> m²</strong></li>
+                        <li class="list-group-item"><span><i class="bi bi-door-open"></i> Habitaciones</span> <strong><?= htmlspecialchars($prop['habitaciones']) ?></strong></li>
+                        <li class="list-group-item"><span><i class="bi bi-droplet"></i> Baños</span> <strong><?= htmlspecialchars($prop['banos']) ?></strong></li>
+                        <li class="list-group-item"><span><i class="bi bi-person-badge"></i> Agente responsable</span> <strong><?= htmlspecialchars($prop['nombre_completo']) ?></strong></li>
                         <li class="list-group-item"><span><i class="bi bi-calendar"></i> Publicado</span> <strong><?= date('d/m/Y', strtotime($prop['fecha_publicacion'])) ?></strong></li>
                     </ul>
 
@@ -161,7 +137,13 @@ if ($img && !empty($img['url_imagen'])) {
                         <?= nl2br(htmlspecialchars($prop['descripcion'])) ?>
                     </div>
 
-                    <a href="agendar_cita.php?propiedad=<?= $id ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'Cliente'): ?>
+                        <a href="reservar_visita.php?id=<?= $prop['id_propiedad'] ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>
+                    <?php else: ?>
+                        <div class="alert alert-secondary text-center mt-4">
+                            La reserva de visitas está disponible para clientes registrados.
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

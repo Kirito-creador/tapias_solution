@@ -73,13 +73,12 @@ if (count($imagenes) > 0) {
 
         .desc-box { font-size: 0.9rem; color: #666; line-height: 1.6; margin-top: 15px; }
 
-        .btn-reservar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 5px; width: 100%; margin-top: 20px; transition: 0.3s; }
+        .btn-reservar { background-color: #C1512F; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 5px; width: 100%; margin-top: 20px; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
         .btn-reservar:hover { background-color: #a34225; color: white; }
     </style>
 </head>
 <body>
 
-    <!-- Navbar simplificada para cliente -->
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="index.php">
@@ -88,24 +87,22 @@ if (count($imagenes) > 0) {
             </a>
             <div class="navbar-nav ms-auto align-items-center">
                 <?php if (isset($_SESSION['rol'])): ?>
-                    <a class="nav-link me-3" href="panel_cliente.php"><i class="bi bi-house"></i> Mi Panel</a>
+                    <a class="nav-link me-3" href="<?= ($_SESSION['rol'] == 'Cliente') ? 'panel_cliente.php' : (($_SESSION['rol'] == 'Agente') ? 'panel_agente.php' : 'panel.php') ?>"><i class="bi bi-grid"></i> Mi Panel</a>
                     <span class="nav-link me-3">Hola, <strong><?= $_SESSION['nombre'] ?></strong></span>
                     <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
                 <?php else: ?>
-                    <a class="nav-link" href="login.php"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión</a>
+                    <a class="nav-link me-3" href="login.php"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión</a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
 
     <div class="container mb-5">
-        <!-- Breadcrumbs -->
         <div class="breadcrumb-custom">
             <a href="index.php">Inicio</a> / <a href="propiedades_publicas.php">Catálogo</a> / <?= htmlspecialchars($prop['tipo']) ?> en <?= htmlspecialchars($prop['zona']) ?>
         </div>
 
         <div class="row">
-            <!-- Columna Izquierda: Imagen -->
             <div class="col-md-7 mb-4">
                 <div class="card-img-container">
                     <?php if($imagen_principal): ?>
@@ -116,7 +113,6 @@ if (count($imagenes) > 0) {
                 </div>
             </div>
 
-            <!-- Columna Derecha: Detalles -->
             <div class="col-md-5">
                 <div class="card-details">
                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -141,8 +137,14 @@ if (count($imagenes) > 0) {
                         <?= nl2br(htmlspecialchars($prop['descripcion'])) ?>
                     </div>
 
-                    <!-- Botón para reservar visita, redirige al formulario de citas -->
-<a href="reservar_visita.php?id=<?= $prop['id_propiedad'] ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>                </div>
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'Cliente'): ?>
+                        <a href="reservar_visita.php?id=<?= $prop['id_propiedad'] ?>" class="btn btn-reservar"><i class="bi bi-calendar-check"></i> Reservar Visita</a>
+                    <?php else: ?>
+                        <div class="alert alert-secondary text-center mt-4">
+                            La reserva de visitas está disponible para clientes registrados.
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
