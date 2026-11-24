@@ -17,49 +17,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $zona = mysqli_real_escape_string($conexion, $_POST['zona']);
     $direccion = mysqli_real_escape_string($conexion, $_POST['direccion']);
     $descripcion = mysqli_real_escape_string($conexion, $_POST['descripcion']);
-    $habitaciones = intval($_POST['habitaciones']);
-    $banos = intval($_POST['banos']);
+    
+    // Recogemos los valores (si están vacíos, los ponemos en 0 por defecto)
+    $habitaciones = $_POST['habitaciones'] !== '' ? intval($_POST['habitaciones']) : 0;
+    $banos = $_POST['banos'] !== '' ? intval($_POST['banos']) : 0;
     $superficie = floatval($_POST['superficie_m2']);
     $id_agente = $_SESSION['id_usuario']; 
 
-    $sql = "INSERT INTO propiedad (tipo, tipo_operacion, precio, moneda, zona, direccion, descripcion, habitaciones, banos, superficie_m2, id_agente) 
-            VALUES ('$tipo', '$tipo_operacion', $precio, '$moneda', '$zona', '$direccion', '$descripcion', $habitaciones, $banos, $superficie, $id_agente)";
-    
-    if(mysqli_query($conexion, $sql)){
-        $id_propiedad = mysqli_insert_id($conexion);
+    // --- LÓGICA DE VALIDACIÓN BACKEND ---
+    // Solo validamos que no estén vacíos si es Casa o Departamento
+    if ($tipo != 'Terreno') {
+        if (trim($_POST['habitaciones']) === '' || trim($_POST['banos']) === '') {
+            $error .= "Para Casas o Departamentos, debes indicar la cantidad de Habitaciones y Baños.<br>";
+        }
+    }
 
-        if (isset($_FILES['imagenes']) && $_FILES['imagenes']['error'][0] != UPLOAD_ERR_NO_FILE) {
-            $total_imagenes = count($_FILES['imagenes']['name']);
-            
-            for ($i = 0; $i < $total_imagenes; $i++) {
-                if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
-                    $tipo_mime = $_FILES['imagenes']['type'][$i];
-                    $contenido = file_get_contents($_FILES['imagenes']['tmp_name'][$i]);
-                    $base64 = base64_encode($contenido);
-                    $url_imagen = "data:$tipo_mime;base64,$base64";
+    if (empty($error)) {
+        $sql = "INSERT INTO propiedad (tipo, tipo_operacion, precio, moneda, zona, direccion, descripcion, habitaciones, banos, superficie_m2, id_agente) 
+                VALUES ('$tipo', '$tipo_operacion', $precio, '$moneda', '$zona', '$direccion', '$descripcion', $habitaciones, $banos, $superficie, $id_agente)";
+        
+        if(mysqli_query($conexion, $sql)){
+            $id_propiedad = mysqli_insert_id($conexion);
 
-                    $es_principal = ($i === 0) ? 1 : 0;
-                    
-                    $sql_img = "INSERT INTO imagen_propiedad (url_imagen, es_principal, id_propiedad) 
-                                VALUES ('$url_imagen', $es_principal, $id_propiedad)";
-                    
-                    if (!mysqli_query($conexion, $sql_img)) {
-                        $error .= "Error al guardar imagen: " . mysqli_error($conexion) . "<br>";
+            if (isset($_FILES['imagenes']) && $_FILES['imagenes']['error'][0] != UPLOAD_ERR_NO_FILE) {
+                $total_imagenes = count($_FILES['imagenes']['name']);
+                for ($i = 0; $i < $total_imagenes; $i++) {
+                    if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
+                        $tipo_mime = $_FILES['imagenes']['type'][$i];
+                        $contenido = file_get_contents($_FILES['imagenes']['tmp_name'][$i]);
+                        $base64 = base64_encode($contenido);
+                        $url_imagen = "data:$tipo_mime;base64,$base64";
+                        $es_principal = ($i === 0) ? 1 : 0;
+                        
+                        $sql_img = "INSERT INTO imagen_propiedad (url_imagen, es_principal, id_propiedad) 
+                                    VALUES ('$url_imagen', $es_principal, $id_propiedad)";
+                        if (!mysqli_query($conexion, $sql_img)) {
+                            $error .= "Error al guardar imagen: " . mysqli_error($conexion) . "<br>";
+                        }
                     }
                 }
             }
-        }
 
-        if (empty($error)) {
-            if($_SESSION['rol'] == 'Agente') {
-                header("Location: propiedades_agente.php");
-            } else {
-                header("Location: propiedades.php");
+            if (empty($error)) {
+                if($_SESSION['rol'] == 'Agente') {
+                    header("Location: propiedades_agente.php");
+                } else {
+                    header("Location: propiedades.php");
+                }
+                exit();
             }
-            exit();
+        } else {
+            $error = "Error al registrar propiedad: " . mysqli_error($conexion);
         }
-    } else {
-        $error = "Error al registrar propiedad: " . mysqli_error($conexion);
     }
 }
 ?>
@@ -114,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label"><i class="bi bi-house"></i> Tipo de Propiedad</label>
-                                <select name="tipo" class="form-select" required>
+                                <select name="tipo" id="tipoPropiedad" class="form-select" required onchange="toggleCampos()">
                                     <option value="">-- Selecciona --</option>
                                     <option value="Casa">Casa</option>
                                     <option value="Departamento">Departamento</option>
@@ -156,15 +165,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="row mb-4">
                             <div class="col-md-4">
                                 <label class="form-label"><i class="bi bi-door-closed"></i> Habitaciones</label>
-                                <input type="number" name="habitaciones" class="form-control" value="0" min="0">
+                                <input type="number" name="habitaciones" id="inputHabitaciones" class="form-control" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label"><i class="bi bi-droplet"></i> Baños</label>
-                                <input type="number" name="banos" class="form-control" value="0" min="0">
+                                <input type="number" name="banos" id="inputBanos" class="form-control" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label"><i class="bi bi-bounding-box"></i> Superficie (m²)</label>
-                                <input type="number" name="superficie_m2" step="0.01" class="form-control" placeholder="0">
+                                <input type="number" name="superficie_m2" step="0.01" class="form-control" placeholder="0" required min="0">
                             </div>
                         </div>
                         <div class="mb-4">
@@ -183,6 +192,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <?php include("footer.php"); ?>
+    
+    <!-- SCRIPT DE LÓGICA DINÁMICA ACTUALIZADO -->
+    <script>
+        function toggleCampos() {
+            const tipo = document.getElementById('tipoPropiedad').value;
+            const inputHabitaciones = document.getElementById('inputHabitaciones');
+            const inputBanos = document.getElementById('inputBanos');
+
+            if (tipo === 'Terreno') {
+                // Solo quitamos el 'required' para que no sea obligatorio llenarlo
+                inputHabitaciones.removeAttribute('required');
+                inputBanos.removeAttribute('required');
+                
+                // Ya NO usamos readonly, para que el usuario pueda escribir si quiere
+                inputHabitaciones.removeAttribute('readonly');
+                inputBanos.removeAttribute('readonly');
+                
+                // Si están vacíos, les ponemos 0 por defecto
+                if (inputHabitaciones.value === '') inputHabitaciones.value = 0;
+                if (inputBanos.value === '') inputBanos.value = 0;
+            } else {
+                // Si es Casa o Departamento, los hacemos obligatorios
+                inputHabitaciones.setAttribute('required', 'true');
+                inputBanos.setAttribute('required', 'true');
+                
+                // Si estaban en 0 por defecto, los limpiamos para que el usuario escriba
+                if (inputHabitaciones.value === '0') inputHabitaciones.value = '';
+                if (inputBanos.value === '0') inputBanos.value = '';
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -10,30 +10,43 @@ if (!isset($_SESSION['rol']) || ($_SESSION['rol'] != 'Administrador' && $_SESSIO
 if (!isset($_GET['id'])) { header("Location: panel.php"); exit(); }
 $id = intval($_GET['id']);
 
+$error = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tipo = $_POST['tipo'];
     $tipo_operacion = $_POST['tipo_operacion'];
-    $precio = $_POST['precio'];
+    $precio = floatval($_POST['precio']);
     $moneda = $_POST['moneda'];
     $estado = $_POST['estado'];
     $zona = mysqli_real_escape_string($conexion, $_POST['zona']);
     $direccion = mysqli_real_escape_string($conexion, $_POST['direccion']);
     $descripcion = mysqli_real_escape_string($conexion, $_POST['descripcion']);
-    $habitaciones = intval($_POST['habitaciones']);
-    $banos = intval($_POST['banos']);
-    $superficie = floatval($_POST['superficie_m2']);
     
-    $sql = "UPDATE propiedad SET tipo='$tipo', tipo_operacion='$tipo_operacion', precio=$precio, moneda='$moneda', estado='$estado', zona='$zona', direccion='$direccion', descripcion='$descripcion', habitaciones=$habitaciones, banos=$banos, superficie_m2=$superficie WHERE id_propiedad=$id";
-            
-    if(mysqli_query($conexion, $sql)){
-        if($_SESSION['rol'] == 'Agente') {
-            header("Location: propiedades_agente.php");
-        } else {
-            header("Location: propiedades.php");
+    // Recogemos los valores (si están vacíos, los ponemos en 0)
+    $habitaciones = $_POST['habitaciones'] !== '' ? intval($_POST['habitaciones']) : 0;
+    $banos = $_POST['banos'] !== '' ? intval($_POST['banos']) : 0;
+    $superficie = floatval($_POST['superficie_m2']);
+
+    // --- LÓGICA DE VALIDACIÓN BACKEND ---
+    if ($tipo != 'Terreno') {
+        if (trim($_POST['habitaciones']) === '' || trim($_POST['banos']) === '') {
+            $error .= "Para Casas o Departamentos, debes indicar la cantidad de Habitaciones y Baños.<br>";
         }
-        exit();
-    } else {
-        echo "Error: " . mysqli_error($conexion);
+    }
+
+    if (empty($error)) {
+        $sql = "UPDATE propiedad SET tipo='$tipo', tipo_operacion='$tipo_operacion', precio=$precio, moneda='$moneda', estado='$estado', zona='$zona', direccion='$direccion', descripcion='$descripcion', habitaciones=$habitaciones, banos=$banos, superficie_m2=$superficie WHERE id_propiedad=$id";
+                
+        if(mysqli_query($conexion, $sql)){
+            if($_SESSION['rol'] == 'Agente') {
+                header("Location: propiedades_agente.php");
+            } else {
+                header("Location: propiedades.php");
+            }
+            exit();
+        } else {
+            $error = "Error: " . mysqli_error($conexion);
+        }
     }
 }
 
@@ -53,11 +66,16 @@ if (!$prop) { die("Propiedad no encontrada."); }
     <div class="container mt-5 mb-5">
         <div class="card shadow p-4 mx-auto" style="max-width: 800px;">
             <h2>Editar Propiedad #<?= $id ?></h2>
+            
+            <?php if(!empty($error)): ?>
+                <div class="alert alert-danger"><?= $error ?></div>
+            <?php endif; ?>
+
             <form method="POST">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label>Tipo:</label>
-                        <select name="tipo" class="form-select" required>
+                        <select name="tipo" id="tipoPropiedad" class="form-select" required onchange="toggleCampos()">
                             <option value="Casa" <?= ($prop['tipo']=='Casa')?'selected':'' ?>>Casa</option>
                             <option value="Departamento" <?= ($prop['tipo']=='Departamento')?'selected':'' ?>>Departamento</option>
                             <option value="Terreno" <?= ($prop['tipo']=='Terreno')?'selected':'' ?>>Terreno</option>
@@ -105,17 +123,17 @@ if (!$prop) { die("Propiedad no encontrada."); }
                     </div>
                     <div class="col-md-3 mb-3">
                         <label>Habitaciones:</label>
-                        <input type="number" name="habitaciones" class="form-control" value="<?= $prop['habitaciones'] ?>">
+                        <input type="number" name="habitaciones" id="inputHabitaciones" class="form-control" value="<?= $prop['habitaciones'] ?>" min="0">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label>Baños:</label>
-                        <input type="number" name="banos" class="form-control" value="<?= $prop['banos'] ?>">
+                        <input type="number" name="banos" id="inputBanos" class="form-control" value="<?= $prop['banos'] ?>" min="0">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label>Superficie (m²):</label>
-                        <input type="number" name="superficie_m2" step="0.01" class="form-control" value="<?= $prop['superficie_m2'] ?>">
+                        <input type="number" name="superficie_m2" step="0.01" class="form-control" value="<?= $prop['superficie_m2'] ?>" required min="0">
                     </div>
                     <div class="col-md-8 mb-3">
                         <label>Descripción:</label>
@@ -127,5 +145,31 @@ if (!$prop) { die("Propiedad no encontrada."); }
             </form>
         </div>
     </div>
+
+    <!-- SCRIPT DE LÓGICA DINÁMICA ACTUALIZADO -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleCampos();
+        });
+
+        function toggleCampos() {
+            const tipo = document.getElementById('tipoPropiedad').value;
+            const inputHabitaciones = document.getElementById('inputHabitaciones');
+            const inputBanos = document.getElementById('inputBanos');
+
+            if (tipo === 'Terreno') {
+                inputHabitaciones.removeAttribute('required');
+                inputBanos.removeAttribute('required');
+                
+                // Quitamos readonly para que permita escribir
+                inputHabitaciones.removeAttribute('readonly');
+                inputBanos.removeAttribute('readonly');
+            } else {
+                inputHabitaciones.setAttribute('required', 'true');
+                inputBanos.setAttribute('required', 'true');
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
