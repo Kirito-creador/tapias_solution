@@ -18,14 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $direccion = mysqli_real_escape_string($conexion, $_POST['direccion']);
     $descripcion = mysqli_real_escape_string($conexion, $_POST['descripcion']);
     
-    // Recogemos los valores (si están vacíos, los ponemos en 0 por defecto)
     $habitaciones = $_POST['habitaciones'] !== '' ? intval($_POST['habitaciones']) : 0;
     $banos = $_POST['banos'] !== '' ? intval($_POST['banos']) : 0;
     $superficie = floatval($_POST['superficie_m2']);
     $id_agente = $_SESSION['id_usuario']; 
 
-    // --- LÓGICA DE VALIDACIÓN BACKEND ---
-    // Solo validamos que no estén vacíos si es Casa o Departamento
     if ($tipo != 'Terreno') {
         if (trim($_POST['habitaciones']) === '' || trim($_POST['banos']) === '') {
             $error .= "Para Casas o Departamentos, debes indicar la cantidad de Habitaciones y Baños.<br>";
@@ -41,9 +38,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (isset($_FILES['imagenes']) && $_FILES['imagenes']['error'][0] != UPLOAD_ERR_NO_FILE) {
                 $total_imagenes = count($_FILES['imagenes']['name']);
+                $formatos_permitidos = ['image/jpeg', 'image/jpg', 'image/png'];
+                $peso_maximo = 5 * 1024 * 1024;
+
                 for ($i = 0; $i < $total_imagenes; $i++) {
                     if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
                         $tipo_mime = $_FILES['imagenes']['type'][$i];
+                        $peso_archivo = $_FILES['imagenes']['size'][$i];
+                        $nombre_archivo = $_FILES['imagenes']['name'][$i];
+
+                        if (!in_array($tipo_mime, $formatos_permitidos)) {
+                            $error .= "El archivo '$nombre_archivo' no es un formato válido (Solo JPG, JPEG, PNG).<br>";
+                            continue;
+                        }
+                        if ($peso_archivo > $peso_maximo) {
+                            $error .= "El archivo '$nombre_archivo' supera el límite de 5MB.<br>";
+                            continue;
+                        }
+
                         $contenido = file_get_contents($_FILES['imagenes']['tmp_name'][$i]);
                         $base64 = base64_encode($contenido);
                         $url_imagen = "data:$tipo_mime;base64,$base64";
@@ -178,8 +190,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="mb-4">
                             <label class="form-label fw-bold"><i class="bi bi-images"></i> Imágenes de la Propiedad</label>
-                            <input type="file" name="imagenes[]" class="form-control" multiple accept="image/*">
-                            <small class="text-muted" style="font-size: 0.8rem;">Puedes seleccionar varias imágenes a la vez (JPG, PNG). La primera será la principal.</small>
+                            <input type="file" name="imagenes[]" class="form-control" multiple accept="image/jpeg, image/jpg, image/png">
+                            <small class="text-muted" style="font-size: 0.8rem;">Puedes seleccionar varias imágenes a la vez (JPG, JPEG, PNG. Máximo 5MB por foto). La primera será la principal.</small>
                         </div>
                         <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
                             <a href="<?= ($_SESSION['rol'] == 'Agente') ? 'propiedades_agente.php' : 'propiedades.php' ?>" class="btn-cancelar">Cancelar</a>
@@ -193,7 +205,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <?php include("footer.php"); ?>
     
-    <!-- SCRIPT DE LÓGICA DINÁMICA ACTUALIZADO -->
     <script>
         function toggleCampos() {
             const tipo = document.getElementById('tipoPropiedad').value;
@@ -201,23 +212,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             const inputBanos = document.getElementById('inputBanos');
 
             if (tipo === 'Terreno') {
-                // Solo quitamos el 'required' para que no sea obligatorio llenarlo
                 inputHabitaciones.removeAttribute('required');
                 inputBanos.removeAttribute('required');
-                
-                // Ya NO usamos readonly, para que el usuario pueda escribir si quiere
                 inputHabitaciones.removeAttribute('readonly');
                 inputBanos.removeAttribute('readonly');
-                
-                // Si están vacíos, les ponemos 0 por defecto
                 if (inputHabitaciones.value === '') inputHabitaciones.value = 0;
                 if (inputBanos.value === '') inputBanos.value = 0;
             } else {
-                // Si es Casa o Departamento, los hacemos obligatorios
                 inputHabitaciones.setAttribute('required', 'true');
                 inputBanos.setAttribute('required', 'true');
-                
-                // Si estaban en 0 por defecto, los limpiamos para que el usuario escriba
                 if (inputHabitaciones.value === '0') inputHabitaciones.value = '';
                 if (inputBanos.value === '0') inputBanos.value = '';
             }
