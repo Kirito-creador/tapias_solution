@@ -22,12 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $direccion = mysqli_real_escape_string($conexion, $_POST['direccion']);
     $descripcion = mysqli_real_escape_string($conexion, $_POST['descripcion']);
     
-    // Recogemos los valores (si están vacíos, los ponemos en 0)
+    
     $habitaciones = $_POST['habitaciones'] !== '' ? intval($_POST['habitaciones']) : 0;
     $banos = $_POST['banos'] !== '' ? intval($_POST['banos']) : 0;
     $superficie = floatval($_POST['superficie_m2']);
 
-    // --- LÓGICA DE VALIDACIÓN BACKEND ---
+    
     if ($tipo != 'Terreno') {
         if (trim($_POST['habitaciones']) === '' || trim($_POST['banos']) === '') {
             $error .= "Para Casas o Departamentos, debes indicar la cantidad de Habitaciones y Baños.<br>";
@@ -146,7 +146,7 @@ if (!$prop) { die("Propiedad no encontrada."); }
         </div>
     </div>
 
-    <!-- SCRIPT DE LÓGICA DINÁMICA ACTUALIZADO -->
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             toggleCampos();

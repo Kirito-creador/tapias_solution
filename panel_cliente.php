@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Cliente') {
 $id_usuario = $_SESSION['id_usuario'];
 $nombre_usuario = $_SESSION['nombre'];
 
-// --- Lógica para buscar/crear el cliente ---
+
 $sql_cliente = "SELECT id_cliente FROM cliente WHERE id_usuario = $id_usuario";
 $res_cliente = mysqli_query($conexion, $sql_cliente);
 $cliente = mysqli_fetch_assoc($res_cliente);
@@ -30,7 +30,7 @@ if (!$cliente) {
     $id_cliente = $cliente['id_cliente'];
 }
 
-// --- Estadísticas ---
+
 $sql_stats = "SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN id_estado_cita = 1 THEN 1 ELSE 0 END) as pendientes,
@@ -39,7 +39,7 @@ $sql_stats = "SELECT
 $res_stats = mysqli_query($conexion, $sql_stats);
 $stats = mysqli_fetch_assoc($res_stats);
 
-// --- Últimas 3 visitas ---
+
 $sql_citas = "SELECT c.fecha_cita, c.hora_inicio, p.tipo, p.zona, ec.nombre_estado AS estado_actual
               FROM cita c 
               INNER JOIN propiedad p ON c.id_propiedad = p.id_propiedad 
@@ -48,7 +48,7 @@ $sql_citas = "SELECT c.fecha_cita, c.hora_inicio, p.tipo, p.zona, ec.nombre_esta
               ORDER BY c.fecha_cita DESC LIMIT 3";
 $res_citas = mysqli_query($conexion, $sql_citas);
 
-// --- Notificaciones ---
+
 $sql_noti = "SELECT COUNT(*) as total FROM notificacion WHERE id_usuario = $id_usuario AND leida = FALSE";
 $res_noti = mysqli_query($conexion, $sql_noti);
 $total_notificaciones = mysqli_fetch_assoc($res_noti)['total'];

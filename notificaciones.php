@@ -9,7 +9,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Obtener todas las notificaciones del agente, ordenadas por fecha descendente
+
 $sql = "SELECT * FROM notificacion WHERE id_usuario = $id_agente ORDER BY fecha_envio DESC";
 $resultado = mysqli_query($conexion, $sql);
 ?>
@@ -60,13 +60,13 @@ $resultado = mysqli_query($conexion, $sql);
             background-color: #ffffff;
         }
         .noti-card.leida {
-            background-color: #f4efe9; /* Color beige opaco como en la imagen */
+            background-color: #f4efe9; 
             opacity: 0.8;
         }
 
         .noti-badge {
             display: inline-block;
-            background-color: #6B6B43; /* Oliva oscuro */
+            background-color: #6B6B43; 
             color: white;
             padding: 4px 12px;
             border-radius: 4px;
