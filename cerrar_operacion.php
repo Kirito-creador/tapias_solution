@@ -85,7 +85,6 @@ if (!$prop) { die("Propiedad no encontrada."); }
                         <input type="hidden" name="id_propiedad" value="<?= $id_propiedad ?>">
                         <input type="hidden" name="precio_publicado" value="<?= $prop['precio'] ?>">
 
-                        <!-- Tipo de Operación (Venta, Alquiler, Anticrético) -->
                         <div class="mb-4">
                             <label class="form-label"><i class="bi bi-tag"></i> Tipo de Operación</label>
                             <select name="tipo_operacion_cierre" id="tipo_operacion" class="form-select" required onchange="calcularComisiones()">
@@ -96,26 +95,22 @@ if (!$prop) { die("Propiedad no encontrada."); }
                             </select>
                         </div>
 
-                        <!-- Precio Final -->
                         <div class="mb-4">
                             <label class="form-label"><i class="bi bi-currency-dollar"></i> Precio Final</label>
                             <input type="number" name="precio_final" id="precio_final" class="form-control" required min="1" step="0.01" value="<?= $prop['precio'] ?>" oninput="calcularComisiones()">
                         </div>
 
-                        <!-- Panel de Comisiones (Oculto hasta que se seleccione operación) -->
                         <div id="panel_comisiones" class="panel-comisiones">
                             <h6>Cálculo de Comisiones:</h6>
                             <p>Comisión Empresa: <span class="text-empresa" id="txt_empresa">$0.00</span></p>
                             <p>Comisión Agente: <span class="text-agente" id="txt_agente">$0.00</span></p>
                         </div>
 
-                        <!-- Observaciones -->
                         <div class="mb-4 mt-4">
                             <label class="form-label"><i class="bi bi-chat-left-text"></i> Observaciones (opcional)</label>
                             <textarea name="observaciones" class="form-control" rows="3"></textarea>
                         </div>
 
-                        <!-- Botones de Acción -->
                         <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
                             <a href="propiedades.php" class="btn-cancelar">Cancelar</a>
                             <button type="submit" class="btn-confirmar"><i class="bi bi-check-circle"></i> Confirmar Cierre</button>

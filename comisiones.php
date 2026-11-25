@@ -2,14 +2,12 @@
 session_start();
 include("conexion.php");
 
-// Validar que sea Administrador
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
     header("Location: panel.php");
     exit();
 }
 
-// Consulta para traer las propiedades vendidas/completadas
-// NOTA: Ajusta el nombre de las columnas (tipo_operacion, precio, etc.) si en tu BD se llaman distinto.
+
 $sql = "SELECT c.id_cita, c.fecha_cita,
                p.tipo AS prop_tipo, p.zona, p.tipo_operacion, p.precio,
                a.nombre_completo AS agente_nombre
@@ -26,7 +24,6 @@ $total_comision_agentes = 0;
 $total_ganancia_neta = 0;
 $citas = [];
 
-// Procesar los datos primero para calcular los totales de las tarjetas
 while ($fila = mysqli_fetch_assoc($resultado)) {
     $precio = $fila['precio'];
     $tipo_op = strtolower(trim($fila['tipo_operacion'])); 
@@ -34,7 +31,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
     $porcentaje_empresa = 0;
     $porcentaje_agente = 0;
 
-    // Lógica de porcentajes exacta solicitada
     if ($tipo_op == 'venta') {
         $porcentaje_empresa = 5.00;
         $porcentaje_agente = 1.00;
@@ -46,18 +42,15 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
         $porcentaje_agente = 0.50;
     }
 
-    // Cálculos
     $comision_empresa = $precio * ($porcentaje_empresa / 100);
     $comision_agente = $precio * ($porcentaje_agente / 100);
     
-    // Ganancia Neta (Asumida como lo que le queda a la empresa)
     $ganancia_neta = $comision_empresa; 
 
     $total_comision_empresa += $comision_empresa;
     $total_comision_agentes += $comision_agente;
     $total_ganancia_neta += $ganancia_neta;
 
-    // Guardar datos para la tabla
     $fila['porcentaje_empresa'] = $porcentaje_empresa;
     $fila['porcentaje_agente'] = $porcentaje_agente;
     $fila['comision_empresa'] = $comision_empresa;
@@ -89,19 +82,16 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
             color: var(--text-color); 
         }
         
-        /* Navbar */
         .navbar { background-color: var(--navbar-bg); border-bottom: 2px solid var(--navbar-bg); }
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
 
-        /* Título principal */
         .page-title {
             font-size: 2.5rem;
             color: var(--navbar-bg);
             margin-bottom: 25px;
         }
 
-        /* Estilos de Tarjetas Superiores */
         .card-stat { 
             background-color: #ffffff; 
             border: 1px solid var(--border-color); 
@@ -125,7 +115,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
         }
         .text-ganancia { color: #1e6b42; } /* Verde oscuro de la imagen */
 
-        /* Estilos de la Tabla */
         .table-custom { 
             background-color: transparent; 
             margin-bottom: 0;
@@ -154,7 +143,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
             border-bottom: 1px solid #f0ebe6; 
         }
         
-        /* Contenedor de la tabla con sombra */
         .table-container {
             background-color: #ffffff;
             border-radius: 8px;
@@ -162,7 +150,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
-        /* Footer */
         footer {
             background-color: var(--navbar-bg);
             color: #F2EBDD;
@@ -183,11 +170,9 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="panel.php">
-                <!-- Icono de casita simulado con Bootstrap Icons -->
                 <i class="bi bi-house-door-fill" style="font-size: 1.8rem; color: #7d9f7d; margin-right: 10px;"></i>
                 <span style="font-weight: 700; font-size: 1.2rem;">Tapia's Solution</span>
             </a>
@@ -211,11 +196,9 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
         </div>
     </nav>
 
-    <!-- Contenido Principal -->
     <div class="container mt-5">
         <h1 class="page-title">Reporte de Comisiones</h1>
 
-        <!-- Tarjetas de Resumen -->
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
                 <div class="card-stat">
@@ -237,7 +220,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
             </div>
         </div>
 
-        <!-- Tabla de Datos -->
         <div class="table-container table-responsive">
             <table class="table table-custom mb-0">
                 <thead>

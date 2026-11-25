@@ -9,7 +9,6 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Consultar citas del agente (unificando los datos)
 $sql = "SELECT c.id_cita, c.fecha_cita, c.hora_inicio, c.hora_fin,
                cli.nombre_completo AS cliente_nombre, cli.telefono AS cliente_telefono, cli.email AS cliente_email,
                p.tipo AS prop_tipo, p.zona AS prop_zona,
@@ -23,7 +22,6 @@ $sql = "SELECT c.id_cita, c.fecha_cita, c.hora_inicio, c.hora_fin,
 
 $resultado = mysqli_query($conexion, $sql);
 
-// Contadores para las tarjetas superiores
 $pendientes = 0;
 $confirmadas = 0;
 $canceladas = 0;
@@ -78,7 +76,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
         .bg-completada { background-color: #6B6B43; } /* Verde Oliva */
         .bg-cancelada { background-color: #555555; } /* Gris */
 
-        /* Botones de acción cuadrados */
         .btn-accion { 
             background-color: transparent; border: 1px solid #ccc; border-radius: 4px; 
             padding: 5px 8px; color: #555; transition: 0.3s; display: inline-flex; 
@@ -110,7 +107,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
             <a href="agendar_cita.php" class="btn" style="background-color: #C1512F; color: white; font-weight: 600;"><i class="bi bi-plus-circle"></i> Nueva Cita</a>
         </div>
 
-        <!-- Tarjetas de Resumen -->
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
                 <div class="card-stat">
@@ -134,7 +130,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
 
         <p class="text-muted mb-3"><i class="bi bi-info-circle"></i> Recordá que cada visita bloquea 2 horas del agente (traslado, mostrar el inmueble y explicar).</p>
 
-        <!-- Tabla de Citas -->
         <div class="table-responsive table-container">
             <table class="table table-custom mb-0">
                 <thead>
@@ -171,7 +166,6 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
                                     <span class="badge-estado <?= $clase ?>"><?= htmlspecialchars($cita['estado_actual']) ?></span>
                                 </td>
                                 <td>
-                                    <!-- Botones de acción: Confirmar, Completar, Cancelar -->
                                     <?php if ($estado == 'pendiente'): ?>
                                         <a href="cambiar_estado_cita.php?id=<?= $cita['id_cita'] ?>&estado=2" class="btn-accion confirmar" title="Confirmar Cita"><i class="bi bi-check-circle"></i></a>
                                     <?php endif; ?>

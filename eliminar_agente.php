@@ -9,8 +9,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     
-    // Al tener llaves foráneas en la tabla propiedades, MySQL no dejará borrar al agente si tiene propiedades.
-    // Una buena práctica es desactivar al usuario en vez de borrarlo:
+    
     $sql = "UPDATE usuario SET activo = 0 WHERE id_usuario = $id";
     
     if (mysqli_query($conexion, $sql)) {

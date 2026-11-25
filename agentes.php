@@ -38,7 +38,6 @@ $resultado = mysqli_query($conexion, $sql);
 </head>
 <body>
 
-    <!-- NAVBAR ACTUALIZADA -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="panel.php">

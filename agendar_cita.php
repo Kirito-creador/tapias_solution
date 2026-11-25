@@ -9,11 +9,9 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// Obtener clientes registrados
 $sql_clientes = "SELECT id_cliente, nombre_completo, telefono FROM cliente ORDER BY nombre_completo ASC";
 $res_clientes = mysqli_query($conexion, $sql_clientes);
 
-// Obtener propiedades del agente
 $sql_propiedades = "SELECT id_propiedad, tipo, zona FROM propiedad WHERE id_agente = $id_agente AND estado = 'Disponible' ORDER BY tipo ASC";
 $res_propiedades = mysqli_query($conexion, $sql_propiedades);
 ?>
@@ -99,7 +97,6 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                             </div>
                         </div>
 
-                        <!-- FORMULARIO 2: Cliente sin cuenta (WhatsApp/Facebook) -->
                         <div id="form_whatsapp" style="display: none;">
                             <div class="row mb-4">
                                 <div class="col-md-6">
@@ -114,7 +111,6 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                             </div>
                         </div>
 
-                        <!-- Propiedad -->
                         <div class="mb-4">
                             <label class="form-label"><i class="bi bi-house"></i> Propiedad</label>
                             <select name="id_propiedad" class="form-select" required>
@@ -125,7 +121,6 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                             </select>
                         </div>
 
-                        <!-- Fecha y Hora -->
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label"><i class="bi bi-calendar"></i> Fecha de la visita</label>
@@ -137,7 +132,6 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                             </div>
                         </div>
 
-                        <!-- Observaciones -->
                         <div class="mb-4">
                             <label class="form-label"><i class="bi bi-chat-left-text"></i> Observaciones</label>
                             <textarea name="observaciones" class="form-control" rows="3" placeholder="Notas de la visita (opcional)"></textarea>
@@ -153,14 +147,12 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
     <?php include("footer.php"); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Script para cambiar entre formularios -->
     <script>
         function toggleFormulario() {
             const formReg = document.getElementById('form_registrado');
             const formWpp = document.getElementById('form_whatsapp');
             const radioReg = document.getElementById('cliente_reg');
             
-            // Manejar los campos 'required' para que no bloqueen el envío
             const selectCli = document.getElementById('select_cliente');
             const nombreManual = document.querySelector('input[name="nombre_manual"]');
             const telefonoManual = document.querySelector('input[name="telefono_manual"]');
@@ -179,7 +171,6 @@ $res_propiedades = mysqli_query($conexion, $sql_propiedades);
                 telefonoManual.setAttribute('required', 'required');
             }
         }
-        // Ejecutar al cargar la página
         toggleFormulario();
     </script>
 </body>
