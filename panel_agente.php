@@ -9,18 +9,15 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Agente') {
 
 $id_agente = $_SESSION['id_usuario'];
 
-// --- NOTIFICACIONES (Contar no leídas) ---
 $sql_noti_count = "SELECT COUNT(*) as total FROM notificacion WHERE id_usuario = $id_agente AND leida = FALSE";
 $res_noti_count = mysqli_query($conexion, $sql_noti_count);
 $total_notificaciones = mysqli_fetch_assoc($res_noti_count)['total'];
 
-// --- CONTADORES DE PROPIEDADES ---
 $total_propiedades = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente"))['total'];
 $disponibles = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Disponible'"))['total'];
 $vendidas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'"))['total'];
 $alquiladas = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad WHERE id_agente = $id_agente AND estado = 'Alquilado'"))['total'];
 
-// Cálculo de comisión (ejemplo: 1% del precio de las propiedades vendidas)
 $comision_query = mysqli_query($conexion, "SELECT SUM(precio * 0.01) as comision FROM propiedad WHERE id_agente = $id_agente AND estado = 'Vendido'");
 $comision = mysqli_fetch_assoc($comision_query)['comision'] ?? 0;
 ?>

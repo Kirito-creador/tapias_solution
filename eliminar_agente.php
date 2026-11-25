@@ -9,7 +9,11 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 62be92fa6883ab292835caa56f06786bb22494b0
     $sql = "UPDATE usuario SET activo = 0 WHERE id_usuario = $id";
     
     if (mysqli_query($conexion, $sql)) {

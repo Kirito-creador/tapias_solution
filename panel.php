@@ -2,41 +2,39 @@
 session_start();
 include("conexion.php");
 
-// Validar que el usuario esté logueado
+
 if (!isset($_SESSION['rol'])) {
     header("Location: login.php");
     exit();
 }
 
-// Redirigir al panel correspondiente si no es Administrador
+
 if ($_SESSION['rol'] == 'Agente') {
     header("Location: panel_agente.php");
     exit();
 } elseif ($_SESSION['rol'] == 'Cliente') {
-    // Por ahora, como aún no existe panel_cliente.php, lo mandamos al inicio
-    // Cuando tu compañero lo cree, puedes cambiarlo a header("Location: panel_cliente.php");
+
     header("Location: index.php");
     exit();
 }
 
-// --- CONSULTAS PARA LOS CONTADORES ---
-// Contar propiedades
+
 $res_prop = mysqli_query($conexion, "SELECT COUNT(*) as total FROM propiedad");
 $total_propiedades = mysqli_fetch_assoc($res_prop)['total'];
 
-// Contar agentes (usuarios con id_rol = 2)
+
 $res_agentes = mysqli_query($conexion, "SELECT COUNT(*) as total FROM usuario WHERE id_rol = 2");
 $total_agentes = mysqli_fetch_assoc($res_agentes)['total'];
 
-// Contar clientes
+
 $res_clientes = mysqli_query($conexion, "SELECT COUNT(*) as total FROM cliente");
 $total_clientes = mysqli_fetch_assoc($res_clientes)['total'];
 
-// Contar citas
+
 $res_citas = mysqli_query($conexion, "SELECT COUNT(*) as total FROM cita");
 $total_citas = mysqli_fetch_assoc($res_citas)['total'];
 
-// --- CONSULTAS PARA PROPIEDADES POR ESTADO ---
+
 $estados = ['Disponible', 'Reservado', 'Vendido', 'Alquilado', 'Anticretico'];
 $conteo_estados = [];
 foreach ($estados as $estado) {
@@ -44,8 +42,7 @@ foreach ($estados as $estado) {
     $conteo_estados[$estado] = mysqli_fetch_assoc($res)['total'];
 }
 
-// --- CONSULTAS PARA FINANZAS ---
-// Sumar comisiones de la empresa de propiedades vendidas/alquiladas
+
 $res_fin = mysqli_query($conexion, "SELECT 
     SUM((precio * comision_empresa_porcentaje) / 100) as comision_empresa,
     SUM((precio * comision_agente_porcentaje) / 100) as comision_agente
@@ -55,7 +52,7 @@ $finanzas = mysqli_fetch_assoc($res_fin);
 
 $comision_empresa = $finanzas['comision_empresa'] ?? 0;
 $comision_agente = $finanzas['comision_agente'] ?? 0;
-$ganancia_neta = $comision_empresa; // En este caso la ganancia neta para la empresa es su comisión
+$ganancia_neta = $comision_empresa; 
 ?>
 <!DOCTYPE html>
 <html lang="es">

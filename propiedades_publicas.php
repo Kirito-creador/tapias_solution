@@ -2,14 +2,14 @@
 session_start();
 include("conexion.php");
 
-// Consulta base: solo propiedades disponibles
+
 $sql = "SELECT p.*, u.nombre_completo AS agente_nombre,
                (SELECT url_imagen FROM imagen_propiedad WHERE id_propiedad = p.id_propiedad LIMIT 1) AS imagen 
         FROM propiedad p 
         INNER JOIN usuario u ON p.id_agente = u.id_usuario 
         WHERE p.estado = 'Disponible'";
 
-// Aplicar filtros si se envían por GET
+
 $where = [];
 if (!empty($_GET['tipo'])) {
     $tipo = mysqli_real_escape_string($conexion, $_GET['tipo']);
@@ -32,7 +32,7 @@ if (count($where) > 0) {
     $sql .= " AND " . implode(" AND ", $where);
 }
 
-// Ordenamiento
+
 $orden = $_GET['orden'] ?? 'defecto';
 if ($orden == 'precio_asc') $sql .= " ORDER BY p.precio ASC";
 elseif ($orden == 'precio_desc') $sql .= " ORDER BY p.precio DESC";
@@ -55,12 +55,12 @@ $total_propiedades = mysqli_num_rows($resultado);
         .navbar-brand, .nav-link { color: #F2EBDD !important; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
 
-        /* Barra de filtros */
+  
         .filter-bar { background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 30px; }
         .filter-bar .form-label { font-size: 0.85rem; font-weight: 600; color: #6B6B43; }
         .filter-bar .form-control, .filter-bar .form-select { border: 1px solid #ddd; font-size: 0.9rem; }
         
-        /* Tarjetas de propiedades */
+
         .prop-card { background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; height: 100%; display: flex; flex-direction: column; }
         .prop-card:hover { transform: translateY(-5px); }
         
